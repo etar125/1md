@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define VERSION "0.25.10_18"
+#define VERSION "0.25.10_19"
 #define BUFFSIZE 4096
 #define MAXSIZE 32768
 
@@ -68,6 +68,30 @@ str_t getln(char *buf, size_t size) {
     return ret;
 }
 
+char *scrch_results[] = {
+    "&amp;",
+    "&gt;",
+    "&lt;"
+};
+
+char scrch(char ch) {
+    switch (ch) {
+        case '>':
+            return 2;
+        case '<':
+            return 1;
+        case '&':
+            return 0;
+        default:
+            return ch;
+    }
+}
+
+#define printch(x) \
+char c = scrch(x);\
+if (c < 3) { printf("%s", scrch_results[c]); }\
+else { printf("%c", c); }
+
 int main(int argc, char **argv) {
     progname = argv[0];
     if (argc != 2) {
@@ -98,7 +122,7 @@ int main(int argc, char **argv) {
         perror("File open error");
         goto error;
     }
-    while((read_bytes = fread(buf, 1, BUFFSIZE, f))) {
+    while ((read_bytes = fread(buf, 1, BUFFSIZE, f))) {
         if (read_bytes != BUFFSIZE) {
             char *t = malloc(read_bytes + 1);
             if (!t) { perror("malloc"); goto error; }
@@ -126,17 +150,12 @@ int main(int argc, char **argv) {
              is_strikethrough = false,
              is_code          = false;
 
-        int code = 0;
-        int dash = 0;
-        int ast  = 0;
         bool p = false;
         int empty_count = 0;
         
         #define MAXCOUNT 512
         
-        //int maxco = 0;
         while (true) {
-            //maxco++;
             ln = getln(buf + pos, sz - pos);
             if (ln.data == (char*)2) { break; }
             if (!ln.data) { goto error; }
@@ -156,40 +175,36 @@ int main(int argc, char **argv) {
                 continue;
             }
             
-            /*if (maxco > MAXCOUNT) {
-                printf("Ахтунг 1!\n%s\n%lu\n", ln.data, pos);
-            }*/
-
-
             #define cur ln.data[i]
-            /* deprecated?
-            bool bold          = false,
-                 italic        = false,
-                 underline     = false,
-                 strikethrough = false,
-                 header = false,
-                 code   = false;*/
             
             /* local */
             
             int h = 0;
+            int code = 0;
+            int dash = 0;
+            int ast  = 0;
 
             bool skip = false;
             bool skip_hr = false;
+            bool skip_list;
             bool alr = false;
 
-            //size_t sum = 0;
             for (size_t i = 0; i <= ln.len; i++) {
-                /*sum++;
-                if (sum > MAXCOUNT) {
-                    printf("Ахтунг 2!\n%s\n%lu\n", ln.data, i);
-                }*/
                 if (skip) { break; }
                 //if (skip_hr && i != 0) { i--; }
                 while (!alr && (cur == ' ' || cur == '\t')) { i++; }
                 if (!cur) {
-                    empty_count++;
+                    if (!alr) { empty_count++; }
                     break;
+                }
+                if (cur == ' ') {
+                    i++;
+                    if (!cur) { i--; }
+                    if (cur == ' ') {
+                        i++;
+                        if (!cur) { printf("<br>"); break; }
+                        else { i -= 2; }
+                    } else { i--; }
                 }
                 if (empty_count) {
                     if (p) {
@@ -198,7 +213,12 @@ int main(int argc, char **argv) {
                     }
                     empty_count = 0;
                 }
-                if (!alr && cur == '#') {
+                if (cur == '\\') {
+                    i++;
+                    if (!cur) { break; }
+                    printch(cur);
+                    alr = true;
+                } else if (!alr && cur == '#') {
                     h++;
                     if (p) {
                         p = false;
@@ -224,7 +244,8 @@ int main(int argc, char **argv) {
                     printf("<a id=\"%s\" href=\"#%s\"><h%d>",
                            wp, wp, h);
                     for (; cur; i++) {
-                        switch (cur) {
+                        printch(cur);
+                        /*switch (cur) {
                             case '<':
                                 printf("&lt;");
                                 break;
@@ -237,7 +258,7 @@ int main(int argc, char **argv) {
                             default:
                                 printf("%c", cur);
                                 break;
-                        }
+                        }*/
                     }
                     printf("</h%d></a>\n", h);
                     free(wp);
@@ -245,11 +266,11 @@ int main(int argc, char **argv) {
                 } else if (!alr && !skip_hr && (cur == '-' || cur == '_' || cur == '*')) {
                     char a = cur;
                     i++;
-                    int count = 1;
+                    dash = 1;
                     while (cur && cur == a) {
-                        i++, count++;
+                        i++, dash++;
                     }
-                    if (count >= 3) {
+                    if (dash >= 3) {
                         if (p) {
                             p = false;
                             printf("</p>\n");
@@ -257,13 +278,39 @@ int main(int argc, char **argv) {
                         printf("<hr>\n");
                         break;
                     } else { skip_hr = true; i = (size_t)-1; continue; }
-                } else {
+                } 
+                
+                else {
                     if (!alr) { alr = true; }
                     if (!p) {
                         p = true;
                         printf("<p>");
                     }
-                    printf("%c", cur);
+                    if (cur == '*') {
+                        i++;
+                        ast = 1;
+                        while (cur && cur == '*' && ast < 3) {
+                            i++, ast++;
+                        }
+                        i--;
+                        if (ast == 1) {
+                            if (is_italic) {
+                                printf("</i>");
+                            } else { printf("<i>"); }
+                            is_italic = !is_italic;
+                        } else if (ast == 2) {
+                            if (is_bold) {
+                                printf("</b>");
+                            } else { printf("<b>"); }
+                            is_bold = !is_bold;
+                        }
+                    } else if (cur == '$') {
+                        if (is_italic) {
+                            printf("</i>");
+                        } else { printf("<i>"); }
+                        is_italic = !is_italic;
+                    }
+                    else { printch(cur); }
                 }
                 /*switch(cur) {
                     case '#':
