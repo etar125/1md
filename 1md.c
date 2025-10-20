@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define VERSION "0.25.10_19"
+#define VERSION "0.25.10_20"
 #define BUFFSIZE 4096
 #define MAXSIZE 32768
 
@@ -148,7 +148,8 @@ int main(int argc, char **argv) {
              is_italic        = false,
              is_underline     = false,
              is_strikethrough = false,
-             is_code          = false;
+             is_code          = false,
+             is_inline        = false;
 
         bool p = false;
         int empty_count = 0;
@@ -184,9 +185,10 @@ int main(int argc, char **argv) {
             int dash = 0;
             int ast  = 0;
 
-            bool skip = false;
-            bool skip_hr = false;
-            bool skip_list;
+            bool skip      = false;
+            bool skip_hr   = false;
+            bool skip_list = false;
+            bool skip_code = false;
             bool alr = false;
 
             for (size_t i = 0; i <= ln.len; i++) {
@@ -245,20 +247,6 @@ int main(int argc, char **argv) {
                            wp, wp, h);
                     for (; cur; i++) {
                         printch(cur);
-                        /*switch (cur) {
-                            case '<':
-                                printf("&lt;");
-                                break;
-                            case '>':
-                                printf("&gt;");
-                                break;
-                            case '&':
-                                printf("&amp;");
-                                break;
-                            default:
-                                printf("%c", cur);
-                                break;
-                        }*/
                     }
                     printf("</h%d></a>\n", h);
                     free(wp);
@@ -267,7 +255,7 @@ int main(int argc, char **argv) {
                     char a = cur;
                     i++;
                     dash = 1;
-                    while (cur && cur == a) {
+                    while (cur == a) {
                         i++, dash++;
                     }
                     if (dash >= 3) {
@@ -278,18 +266,56 @@ int main(int argc, char **argv) {
                         printf("<hr>\n");
                         break;
                     } else { skip_hr = true; i = (size_t)-1; continue; }
-                } 
+                } else if (!alr && !skip_code && cur == '`') {
+                    i++;
+                    code = 1;
+                    while (cur == '`') {
+                        i++, code++;
+                    }
+                    if (code != 3) { skip_code = true; i = (size_t)-1; continue; }
+                    if (!is_code) {
+                        size_t start = i;
+                        bool ws = false;
+                        if (cur) {
+                            while (cur) {
+                                if (cur == ' ' || cur == '\t') {
+                                    ws = true; break;
+                                }
+                                i++;
+                            }
+                            if (ws) { skip_code = true; i = (size_t)-1; continue; }
+                            if (p) {
+                                p = false;
+                                printf("</p>\n");
+                            }
+                            printf("<pre>");
+                            if (ln.data[start]) {
+                                printf("<code class=\"language-");
+                                i = start;
+                                while (cur) {
+                                    printch(cur);
+                                    i++;
+                                }
+                                printf("\">\n");
+                            } else { printf("<code>\n"); }
+                            is_code = true;
+                        }
+                    } else {
+                        is_code = false;
+                        printf("</code></pre>\n");
+                    }
+                }
                 
                 else {
                     if (!alr) { alr = true; }
-                    if (!p) {
+                    if (!is_code && !p) {
                         p = true;
                         printf("<p>");
                     }
-                    if (cur == '*') {
+                    if ((!is_inline && !is_code) && cur == '*') {
                         i++;
                         ast = 1;
-                        while (cur && cur == '*' && ast < 3) {
+                        while (cur == '*' && ast < 3) {
                             i++, ast++;
                         }
                         i--;
@@ -304,52 +330,19 @@ int main(int argc, char **argv) {
                             } else { printf("<b>"); }
                             is_bold = !is_bold;
                         }
-                    } else if (cur == '$') {
+                    } else if ((!is_inline && !is_code) && cur == '$') {
                         if (is_italic) {
                             printf("</i>");
                         } else { printf("<i>"); }
                         is_italic = !is_italic;
+                    } else if (cur == '`') {
+                        if (is_inline) {
+                            printf("</code>");
+                        } else { printf("<code>"); }
+                        is_inline = !is_inline;
                     }
                     else { printch(cur); }
                 }
-                /*switch(cur) {
-                    case '#':
-                        h++;
-                        break;
-                    case '`':
-                        code++;
-                        break;
-                    case '-':
-                        dash++;
-                        break;
-                    case '*':
-                        ast++;
-                        break;
-                    default:
-                        if (h) {
-                            if (cur == ' ') {
-                                i++;
-                                if (!cur) { break; }
-                            }
-                            size_t len = ln.len - i;
-                            char *wp = malloc(len + 1);
-                            if (!wp) { perror("malloc"); goto error; }
-                            memcpy(wp, ln.data + i, len);
-                            for (size_t i = 0; i < len; i++) {
-                                if (wp[i] == ' ') {
-                                    wp[i] = '_';
-                                }
-                            }
-                            printf("<a id=\"%s\" href=\"#%s\"><h%d>%s</h%d></a>\n",
-                                   wp, wp, h, ln.data + i, h);
-                            free(wp);
-                            skip = true;
-                        } else {
-                            printf("%s\n", ln.data);
-                            skip = true;
-                        }
-                        break;
-                }*/
             }
             if (alr) { printf("\n"); }
             pos += ln.len + 1;
