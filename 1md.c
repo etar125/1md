@@ -243,12 +243,12 @@ int main(int argc, char **argv) {
                         }
                     }
                     wp[len] = '\0';
-                    printf("<a id=\"%s\" href=\"#%s\"><h%d>",
-                           wp, wp, h);
+                    printf("<h%d><a class=\"header-link\" id=\"%s\" href=\"#%s\">",
+                           h, wp, wp);
                     for (; cur; i++) {
                         printch(cur);
                     }
-                    printf("</h%d></a>\n", h);
+                    printf("</a></h%d>\n", h);
                     free(wp);
                     skip = true;
                 } else if (!alr && !skip_hr && (cur == '-' || cur == '_' || cur == '*')) {
