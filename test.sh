@@ -3,11 +3,9 @@
 BROWSER=dillo
 
 echo "compiling"
-gcc -g 1md.c -o 1md
+gcc -g 1md.c -o 1md || exit 1
 echo "md > html"
-./1md "test.md" > "test.html" || {
-    gdb ./1md
-}
+./1md "test.md" > "test.html" || exit 1
 
 echo "creating basic html"
 
