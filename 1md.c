@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define VERSION "0.25.10_20"
+#define VERSION "0.25.10_22"
 #define BUFFSIZE 4096
 #define MAXSIZE 32768
 
@@ -92,6 +92,12 @@ char c = scrch(x);\
 if (c < 3) { printf("%s", scrch_results[c]); }\
 else { printf("%c", c); }
 
+int is_digit(char ch) {
+    if (ch <= '9' && ch >= '0') {
+        return 1;
+    } return 0;
+}
+
 int main(int argc, char **argv) {
     progname = argv[0];
     if (argc != 2) {
@@ -149,7 +155,11 @@ int main(int argc, char **argv) {
              is_underline     = false,
              is_strikethrough = false,
              is_code          = false,
-             is_inline        = false;
+             is_inline        = false,
+             is_list          = false,
+             nlist            = false;
+        
+        char listch = ' ';
 
         bool p = false;
         int empty_count = 0;
@@ -190,6 +200,7 @@ int main(int argc, char **argv) {
             bool skip_list = false;
             bool skip_code = false;
             bool alr = false;
+            bool list_cancel = true;
 
             for (size_t i = 0; i <= ln.len; i++) {
                 if (skip) { break; }
@@ -266,7 +277,38 @@ int main(int argc, char **argv) {
                         printf("<hr>\n");
                         break;
                     } else { skip_hr = true; i = (size_t)-1; continue; }
-                } else if (!alr && !skip_code && cur == '`') {
+                } else if (!alr && !skip_list && (cur == '-' || cur == '*' || is_digit(cur))) {
+                    if (is_digit(cur)) {
+                        
+                        nlist = true;
+                        i++;
+                        if (cur != '.') {
+                            if (is_list) {
+                                is_list = false;
+                                printf("</li></%s>", nlist ? "ol" : "ul");
+                                nlist = false;
+                            }
+                            skip_list = true; i = (size_t)-1; continue;
+                        }
+                    }
+                    i++;
+                    if (cur != ' ') {
+                        if (is_list) {
+                            is_list = false;
+                            printf("</li></%s>", nlist ? "ol" : "ul");
+                            nlist = false;
+                        }
+                        skip_list = true; i = (size_t)-1; continue;
+                    }
+                    if (is_list) { 
+                        printf("</li>\n<li>");
+                    } else {
+                        is_list = true;
+                        printf("<%s><li>", nlist ? "ol" : "ul");
+                    }
+                    list_cancel = false, alr = true;
+                }
+                else if (!alr && !skip_code && cur == '`') {
                     i++;
                     code = 1;
                     while (cur == '`') {
@@ -308,6 +350,11 @@ int main(int argc, char **argv) {
                 
                 else {
                     if (!alr) { alr = true; }
+                    if (is_list && list_cancel) {
+                        printf("</li></%s>\n", nlist ? "ol" : "ul");
+                        nlist = false;
+                        is_list = false;
+                    }
                     if (!is_code && !p) {
                         p = true;
                         printf("<p>");
@@ -348,6 +395,11 @@ int main(int argc, char **argv) {
             pos += ln.len + 1;
             free(ln.data);
             ln.data = NULL;
+        }
+        if (is_list) {
+            printf("</li></%s>\n", nlist ? "ol" : "ul");
+            nlist = false;
+            is_list = false;
         }
         if (p) {
             printf("</p>\n");
