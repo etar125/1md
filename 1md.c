@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define VERSION "0.25.10_22"
+#define VERSION "0.25.10_23"
 #define BUFFSIZE 4096
 #define MAXSIZE 32768
 
@@ -77,9 +77,9 @@ char *scrch_results[] = {
 char scrch(char ch) {
     switch (ch) {
         case '>':
-            return 2;
-        case '<':
             return 1;
+        case '<':
+            return 2;
         case '&':
             return 0;
         default:
@@ -87,10 +87,11 @@ char scrch(char ch) {
     }
 }
 
-#define printch(x) \
-char c = scrch(x);\
-if (c < 3) { printf("%s", scrch_results[c]); }\
-else { printf("%c", c); }
+void printch(char ch) {
+    char c = scrch(ch);
+    if (c < 3) { printf("%s", scrch_results[c]); }
+    else { printf("%c", c); }
+}
 
 int is_digit(char ch) {
     if (ch <= '9' && ch >= '0') {
@@ -163,6 +164,14 @@ int main(int argc, char **argv) {
 
         bool p = false;
         int empty_count = 0;
+        int list_level = 0;
+        
+        bool lvls_nlist[6] = {
+            false, false, false, false, false, false
+        };
+        bool lvls_is_list[6] = {
+            false, false, false, false, false, false
+        };
         
         #define MAXCOUNT 512
         
@@ -201,15 +210,34 @@ int main(int argc, char **argv) {
             bool skip_code = false;
             bool alr = false;
             bool list_cancel = true;
+            
+            int indent_level = 0;
 
             for (size_t i = 0; i <= ln.len; i++) {
                 if (skip) { break; }
                 //if (skip_hr && i != 0) { i--; }
-                while (!alr && (cur == ' ' || cur == '\t')) { i++; }
+                int spaces_count = 0;
+                while (!alr && (cur == ' ' || cur == '\t')) {
+                    if (cur == ' ') {
+                        spaces_count++;
+                        if (spaces_count == 3) {
+                            spaces_count = 0;
+                            indent_level++;
+                        }
+                    } else {
+                        indent_level++;
+                    }
+                    i++;
+                }
+                if (indent_level > 5) {
+                    fprintf(stderr, "max indent level reached, setting to 6\n");
+                    indent_level = 5;
+                }
                 if (!cur) {
                     if (!alr) { empty_count++; }
                     break;
                 }
+                
                 if (cur == ' ') {
                     i++;
                     if (!cur) { i--; }
@@ -278,33 +306,40 @@ int main(int argc, char **argv) {
                         break;
                     } else { skip_hr = true; i = (size_t)-1; continue; }
                 } else if (!alr && !skip_list && (cur == '-' || cur == '*' || is_digit(cur))) {
+                    for (int i = 5; i > indent_level; i--) {
+                        if (lvls_is_list[i]) {
+                            lvls_is_list[i] = false;
+                            printf("</li></%s>", lvls_nlist[i] ? "ol" : "ul");
+                            lvls_nlist[i] = false;
+                        }
+                    }
                     if (is_digit(cur)) {
-                        
-                        nlist = true;
+                        lvls_nlist[indent_level] = true;
                         i++;
+                        while (is_digit(cur)) { i++; }
                         if (cur != '.') {
-                            if (is_list) {
-                                is_list = false;
-                                printf("</li></%s>", nlist ? "ol" : "ul");
-                                nlist = false;
+                            if (lvls_is_list[indent_level]) {
+                                lvls_is_list[indent_level] = false;
+                                printf("</li></%s>", lvls_nlist[indent_level] ? "ol" : "ul");
+                                lvls_nlist[indent_level] = false;
                             }
                             skip_list = true; i = (size_t)-1; continue;
                         }
                     }
                     i++;
                     if (cur != ' ') {
-                        if (is_list) {
-                            is_list = false;
-                            printf("</li></%s>", nlist ? "ol" : "ul");
-                            nlist = false;
+                        if (lvls_is_list[indent_level]) {
+                            lvls_is_list[indent_level] = false;
+                            printf("</li></%s>", lvls_nlist[indent_level] ? "ol" : "ul");
+                            lvls_nlist[indent_level] = false;
                         }
                         skip_list = true; i = (size_t)-1; continue;
                     }
-                    if (is_list) { 
+                    if (lvls_is_list[indent_level]) { 
                         printf("</li>\n<li>");
                     } else {
-                        is_list = true;
-                        printf("<%s><li>", nlist ? "ol" : "ul");
+                        lvls_is_list[indent_level] = true;
+                        printf("<%s><li>", lvls_nlist[indent_level] ? "ol" : "ul");
                     }
                     list_cancel = false, alr = true;
                 }
@@ -350,11 +385,20 @@ int main(int argc, char **argv) {
                 
                 else {
                     if (!alr) { alr = true; }
-                    if (is_list && list_cancel) {
-                        printf("</li></%s>\n", nlist ? "ol" : "ul");
-                        nlist = false;
-                        is_list = false;
+                    if (list_cancel) {
+                        for (int i = 5; i >= indent_level; i--) {
+                            if (lvls_is_list[i]) {
+                                lvls_is_list[i] = false;
+                                printf("</li></%s>", lvls_nlist[i] ? "ol" : "ul");
+                                lvls_nlist[i] = false;
+                            }
+                        }
                     }
+                    /*if (lvls_is_list[indent_level] && list_cancel) {
+                        printf("</li></%s>\n", lvls_nlist[indent_level] ? "ol" : "ul");
+                        lvls_nlist[indent_level] = false;
+                        lvls_is_list[indent_level] = false;
+                    }*/
                     if (!is_code && !p) {
                         p = true;
                         printf("<p>");
@@ -396,10 +440,12 @@ int main(int argc, char **argv) {
             free(ln.data);
             ln.data = NULL;
         }
-        if (is_list) {
-            printf("</li></%s>\n", nlist ? "ol" : "ul");
-            nlist = false;
-            is_list = false;
+        for (int indent_level = 5; indent_level >= 0; indent_level--) {
+            if (lvls_is_list[indent_level]) {
+                printf("</li></%s>\n", lvls_nlist[indent_level] ? "ol" : "ul");
+                lvls_nlist[indent_level] = false;
+                lvls_is_list[indent_level] = false;
+            }
         }
         if (p) {
             printf("</p>\n");
