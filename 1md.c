@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define VERSION "0.25.10_23"
+#define VERSION "0.25.10_24"
 #define BUFFSIZE 4096
 #define MAXSIZE 32768
 
@@ -173,6 +173,8 @@ int main(int argc, char **argv) {
             false, false, false, false, false, false
         };
         
+        size_t latest_list_i = 0;
+        
         #define MAXCOUNT 512
         
         while (true) {
@@ -253,6 +255,9 @@ int main(int argc, char **argv) {
                         printf("</p>\n");
                     }
                     empty_count = 0;
+                }
+                if (lvls_is_list[indent_level] && i == latest_list_i) {
+                    list_cancel = false;
                 }
                 if (cur == '\\') {
                     i++;
@@ -341,7 +346,7 @@ int main(int argc, char **argv) {
                         lvls_is_list[indent_level] = true;
                         printf("<%s><li>", lvls_nlist[indent_level] ? "ol" : "ul");
                     }
-                    list_cancel = false, alr = true;
+                    list_cancel = false, alr = true, latest_list_i = i + 1;
                 }
                 else if (!alr && !skip_code && cur == '`') {
                     i++;
@@ -385,6 +390,9 @@ int main(int argc, char **argv) {
                 
                 else {
                     if (!alr) { alr = true; }
+                    /*if (lvls_is_list[indent_level] && i == latest_list_i) {
+                        list_cancel = false;
+                    }*/
                     if (list_cancel) {
                         for (int i = 5; i >= indent_level; i--) {
                             if (lvls_is_list[i]) {
