@@ -13,6 +13,8 @@
 #define BUFFSIZE 4096
 #define MAXSIZE 32768
 
+#define log(x) fprintf(stderr, x)
+
 char *progname;
 
 int usage() {
@@ -88,6 +90,10 @@ char scrch(char ch) {
 }
 
 void printch(char ch) {
+    if ((unsigned char)ch > 127) {
+        printf("%c", ch);
+        return;
+    }
     char c = scrch(ch);
     if (c < 3) { printf("%s", scrch_results[c]); }
     else { printf("%c", c); }
@@ -210,10 +216,13 @@ int main(int argc, char **argv) {
             bool skip_hr   = false;
             bool skip_list = false;
             bool skip_code = false;
+            bool skip_link = false;
             bool alr = false;
             bool list_cancel = true;
             
             int indent_level = 0;
+            
+            bool link_is_image = false;
 
             for (size_t i = 0; i <= ln.len; i++) {
                 if (skip) { break; }
@@ -239,7 +248,6 @@ int main(int argc, char **argv) {
                     if (!alr) { empty_count++; }
                     break;
                 }
-                
                 if (cur == ' ') {
                     i++;
                     if (!cur) { i--; }
@@ -439,6 +447,47 @@ int main(int argc, char **argv) {
                             printf("</code>");
                         } else { printf("<code>"); }
                         is_inline = !is_inline;
+                    } else if (!skip_link && cur == '!') {
+                        i++;
+                        if (cur == '[') {
+                            link_is_image = true;
+                            i--;
+                        } else { i--; printch(cur); }
+                    } else if (!skip_link && cur == '[') {
+                        size_t end_text, start_link, end_link;
+                        size_t t = i;
+                        while (cur && cur != ']') { i++; }
+                        #define SKIP skip_link = true; i = t - 1; continue
+                        if (!cur) { SKIP; }
+                        end_text = i++;
+                        if (cur != '(') { SKIP; }
+                        i++;
+                        if (!cur) { SKIP; }
+                        start_link = i;
+                        while (cur && cur != ')') { i++; }
+                        if (!cur) { SKIP; }
+                        end_link = i;
+                        if (!link_is_image) {
+                            printf("<a href=\"");
+                            for (i = start_link; i < end_link; i++) {
+                                printch(cur);
+                            }
+                            printf("\">");
+                            i = t;
+                        } else {
+                            printf("<img src=\"");
+                            for (i = start_link; i < end_link; i++) {
+                                printch(cur);
+                            }
+                            printf("\" alt=\"");
+                            for (i = t + 1; i < end_text; i++) {
+                                printch(cur);
+                            }
+                            i = end_link;
+                        }
+                    } else if (!skip_link && cur == ']') {
+                        printf("</a>");
+                        while (cur && cur != ')') { i++; }
                     }
                     else { printch(cur); }
                 }
