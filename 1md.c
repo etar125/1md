@@ -107,7 +107,30 @@ int is_digit(char ch) {
 
 int main(int argc, char **argv) {
     progname = argv[0];
-    if (argc != 2) {
+    char *class = NULL;
+    char *id = NULL;
+    char *filename = NULL;
+    if (argc < 2) {
+        return usage();
+    }
+    for (int i = 1; i < argc; i++) {
+        if (argv[i][0] == '-') {
+            if (strcmp(argv[i], "-id") == 0) {
+                i++;
+                if (i < argc) {
+                    id = argv[i];
+                } else { return usage(); }
+            } else if (strcmp(argv[i], "-class") == 0) {
+                i++;
+                if (i < argc) {
+                    class = argv[i];
+                } else { return usage(); }
+            } else {
+                return usage();
+            }
+        } else { filename = argv[i]; }
+    }
+    if (!filename) {
         return usage();
     }
     char *buf = malloc(BUFFSIZE + 1);
@@ -119,9 +142,14 @@ int main(int argc, char **argv) {
     size_t read_bytes;
     FILE *f = NULL;
     
-    
+    if (id || class) {
+        printf("<div");
+        if (class) { printf(" class=\"%s\"", class); }
+        if (id) { printf(" id=\"%s\"", id); }
+        printf(">\n");
+    }
 
-    char *filename = argv[1];
+    
 
     str_t ln;
     ln.data = NULL;
@@ -509,7 +537,7 @@ int main(int argc, char **argv) {
         }
         pos = 0;
     }
-    
+    if (id || class) { printf("</div>\n"); }
     return 0;
 error:
     free(ln.data);
