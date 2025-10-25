@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define VERSION "0.25.10_24"
+#define VERSION "0.25.10_25"
 #define BUFFSIZE 4096
 #define MAXSIZE 32768
 
