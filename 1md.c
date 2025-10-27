@@ -394,6 +394,11 @@ int main(int argc, char **argv) {
                     if (!is_code) {
                         size_t start = i;
                         bool ws = false;
+                        if (p) {
+                            p = false;
+                            printf("</p>\n");
+                        }
+                        printf("<pre>");
                         if (cur) {
                             while (cur) {
                                 if (cur == ' ' || cur == '\t') {
@@ -402,22 +407,14 @@ int main(int argc, char **argv) {
                                 i++;
                             }
                             if (ws) { skip_code = true; i = (size_t)-1; continue; }
-                            if (p) {
-                                p = false;
-                                printf("</p>\n");
+                            i = start;
+                            while (cur) {
+                                printch(cur);
+                                i++;
                             }
-                            printf("<pre>");
-                            if (ln.data[start]) {
-                                printf("<code class=\"language-");
-                                i = start;
-                                while (cur) {
-                                    printch(cur);
-                                    i++;
-                                }
-                                printf("\">\n");
-                            } else { printf("<code>\n"); }
-                            is_code = true;
-                        }
+                            printf("\">\n");
+                        } else { printf("<code>\n"); }
+                        is_code = true;
                     } else {
                         is_code = false;
                         printf("</code></pre>\n");
