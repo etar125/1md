@@ -194,6 +194,8 @@ int main(int argc, char **argv) {
              is_list          = false,
              nlist            = false;
         
+        int add_br = 0;
+        
         char listch = ' ';
 
         bool p = false;
@@ -247,6 +249,7 @@ int main(int argc, char **argv) {
             bool skip_link = false;
             bool alr = false;
             bool list_cancel = true;
+            bool my_br = false;
             
             int indent_level = 0;
             
@@ -276,18 +279,19 @@ int main(int argc, char **argv) {
                     if (!alr) { empty_count++; }
                     break;
                 }
-                if (cur == ' ') {
+                if (!is_code && cur == ' ') {
                     i++;
                     if (!cur) { i--; }
                     if (cur == ' ') {
                         i++;
-                        if (!cur) { printf("<br>"); break; }
+                        if (!cur) { add_br++; my_br = true; break; }
                         else { i -= 2; }
                     } else { i--; }
                 }
                 if (empty_count) {
                     if (p) {
                         p = false;
+                        add_br = 0;
                         printf("</p>\n");
                     }
                     empty_count = 0;
@@ -298,12 +302,14 @@ int main(int argc, char **argv) {
                 if (cur == '\\') {
                     i++;
                     if (!cur) { break; }
+                    if ((add_br == 1 && !my_br) || add_br > 1) { add_br--; printf("<br>\n"); }
                     printch(cur);
                     alr = true;
                 } else if (!alr && cur == '#') {
                     h++;
                     if (p) {
                         p = false;
+                        add_br = 0;
                         printf("</p>\n");
                     }
                     i++;
@@ -341,6 +347,7 @@ int main(int argc, char **argv) {
                     if (dash >= 3) {
                         if (p) {
                             p = false;
+                            add_br = 0;
                             printf("</p>\n");
                         }
                         printf("<hr>\n");
@@ -396,6 +403,7 @@ int main(int argc, char **argv) {
                         bool ws = false;
                         if (p) {
                             p = false;
+                            add_br = 0;
                             printf("</p>\n");
                         }
                         printf("<pre>");
@@ -422,7 +430,10 @@ int main(int argc, char **argv) {
                 }
                 
                 else {
-                    if (!alr) { alr = true; }
+                    if (!alr) {
+                        if ((add_br == 1 && !my_br) || add_br > 1) { add_br--; printf("<br>\n"); }
+                        alr = true;
+                    }
                     /*if (lvls_is_list[indent_level] && i == latest_list_i) {
                         list_cancel = false;
                     }*/
@@ -517,8 +528,12 @@ int main(int argc, char **argv) {
                     }
                     else { printch(cur); }
                 }
+                //if (add_br) { add_br--; }
             }
-            if (alr) { printf("\n"); }
+            if (alr) {
+                if ((add_br == 1 && !my_br) || add_br > 1) { add_br--; printf("<br>\n"); }
+                printf("\n");
+            }
             pos += ln.len + 1;
             free(ln.data);
             ln.data = NULL;

@@ -4,7 +4,7 @@
 -=-=-=-=-=-=-  
 *Headers*
 
-This is test.
+This is test.  
 # Header 1
 ## Header 2
 ### Header 3
@@ -52,7 +52,7 @@ Hello
 
 - Element 1
 - Element **2**
-    - Element 1
+    - Element 1  
     * Element 2
         - Hallo
     - \- Hello?  
