@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define VERSION "0.25.10_25"
+#define VERSION "0.25.10_27"
 #define BUFFSIZE 4096
 #define MAXSIZE 32768
 
@@ -269,7 +269,7 @@ int main(int argc, char **argv) {
                     i++;
                 }
                 if (indent_level > 5) {
-                    fprintf(stderr, "max indent level reached, setting to 6\n");
+                    fprintf(stderr, "max list level reached, setting to 6\n");
                     indent_level = 5;
                 }
                 if (!cur) {
@@ -318,7 +318,7 @@ int main(int argc, char **argv) {
                     if (!wp) { perror("malloc"); goto error; }
                     memcpy(wp, ln.data + i, len);
                     for (size_t b = 0; b < len; b++) {
-                        if (wp[b] == ' ' || wp[b] == '<' || wp[b] == '>' || wp[b] == '&') {
+                        if (wp[b] == '?' || wp[b] == ' ' || wp[b] == '<' || wp[b] == '>' || wp[b] == '&') {
                             wp[b] = '_';
                         }
                     }
@@ -443,7 +443,7 @@ int main(int argc, char **argv) {
                         lvls_nlist[indent_level] = false;
                         lvls_is_list[indent_level] = false;
                     }*/
-                    if (!is_code && !p) {
+                    if (!is_code && !lvls_is_list[indent_level] && !p) {
                         p = true;
                         printf("<p>");
                     }
@@ -512,6 +512,7 @@ int main(int argc, char **argv) {
                                 printch(cur);
                             }
                             i = end_link;
+                            printf("\">");
                         }
                     } else if (!skip_link && cur == ']') {
                         printf("</a>");
