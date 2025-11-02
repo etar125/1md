@@ -39,13 +39,13 @@ proc ranl {text} {
 
 set tests {
     {
-        "# Заголовок 1-го уровня
+    "# Заголовок 1-го уровня
 ## 2 > 3
 ### 9==3
 #### Привет
 ##### Пока-пока!
 ###### a b c биба & боба"
-        "<h1><a class=\"header-link\" id=\"Заголовок_1-го_уровня\" href=\"#Заголовок_1-го_уровня\">Заголовок 1-го уровня</a></h1>
+    "<h1><a class=\"header-link\" id=\"Заголовок_1-го_уровня\" href=\"#Заголовок_1-го_уровня\">Заголовок 1-го уровня</a></h1>
 <h2><a class=\"header-link\" id=\"2___3\" href=\"#2___3\">2 &gt; 3</a></h2>
 <h3><a class=\"header-link\" id=\"9==3\" href=\"#9==3\">9==3</a></h3>
 <h4><a class=\"header-link\" id=\"Привет\" href=\"#Привет\">Привет</a></h4>
@@ -63,6 +63,14 @@ set tests {
     {
     "`inline` `*inlin1\\``"
     "<p><code>inline</code> <code>*inlin1`</code></p>"
+    }
+    {
+    "```c
+/* code */  
+```  text
+Code.  "
+    "<pre><code class=\"language-c\">/* code */</code></pre>
+<p>Code.</p>"
     }
 }
 
