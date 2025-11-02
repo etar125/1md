@@ -416,6 +416,7 @@ int main(int argc, char **argv) {
                             }
                             if (ws) { skip_code = true; i = (size_t)-1; continue; }
                             i = start;
+                            printf("<code class=\"language-");
                             while (cur) {
                                 printch(cur);
                                 i++;
@@ -426,6 +427,7 @@ int main(int argc, char **argv) {
                     } else {
                         is_code = false;
                         printf("</code></pre>\n");
+                        break;
                     }
                 }
                 

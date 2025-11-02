@@ -69,7 +69,9 @@ set tests {
 /* code */  
 ```  text
 Code.  "
-    "<pre><code class=\"language-c\">/* code */</code></pre>
+    "<pre><code class=\"language-c\">
+/* code */  
+</code></pre>
 <p>Code.</p>"
     }
 }
