@@ -386,6 +386,11 @@ int main(int argc, char **argv) {
                     if (lvls_is_list[indent_level]) { 
                         printf("</li>\n<li>");
                     } else {
+                        if (p) {
+                            p = false;
+                            add_br = 0;
+                            printf("</p>\n");
+                        }
                         lvls_is_list[indent_level] = true;
                         printf("<%s><li>", lvls_nlist[indent_level] ? "ol" : "ul");
                     }
