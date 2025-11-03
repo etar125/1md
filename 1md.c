@@ -250,6 +250,7 @@ int main(int argc, char **argv) {
             bool alr = false;
             bool list_cancel = true;
             bool my_br = false;
+            bool link = false;
             
             int indent_level = 0;
             
@@ -403,7 +404,26 @@ int main(int argc, char **argv) {
                         lvls_is_list[indent_level] = true;
                         printf("<%s><li>", lvls_nlist[indent_level] ? "ol" : "ul");
                     }
+                    bool lcj0 = false;
+                    i++;
+                    if (cur == '[') {
+                        i++;
+                        if (cur) {
+                            i++;
+                            if (cur == ']') {
+                                i--;
+                                printf("<input type=\"checkbox\"%sdisabled=\"\">",
+                                       cur == ' ' ? " " : " checked=\"\" ");
+                                i -= 2;
+                                lcj0 = true;
+                            } else { i -= 2; }
+                        } else { i--; }
+                    }
+                    i--;
                     list_cancel = false, alr = true, latest_list_i = i + 1;
+                    if (lcj0) {
+                        i += 4;
+                    }
                 }
                 else if (!alr && !skip_code && cur == '`') {
                     i++;
@@ -499,7 +519,7 @@ int main(int argc, char **argv) {
                             printf("</code>");
                         } else { printf("<code>"); }
                         is_inline = !is_inline;
-                    } else if (!skip_link && cur == '!') {
+                    } else if ((!is_inline && !is_code) && !skip_link && cur == '!') {
                         i++;
                         if (cur == '[') {
                             link_is_image = true;
@@ -538,7 +558,8 @@ int main(int argc, char **argv) {
                             i = end_link;
                             printf("\">");
                         }
-                    } else if ((!is_inline && !is_code) && !skip_link && cur == ']') {
+                        link = true;
+                    } else if ((!is_inline && !is_code) && !skip_link && link && cur == ']') {
                         printf("</a>");
                         while (cur && cur != ')') { i++; }
                     }
