@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define VERSION "0.25.10_29"
+#define VERSION "0.25.11_3"
 #define BUFFSIZE 4096
 #define MAXSIZE 32768
 
@@ -281,12 +281,12 @@ int main(int argc, char **argv) {
                 }
                 if (!is_code && cur == ' ') {
                     i++;
-                    if (!cur) { i--; }
-                    if (cur == ' ') {
+                    if (!cur || cur != ' ') { i--; }
+                    else {
                         i++;
                         if (!cur) { add_br++; my_br = true; break; }
                         else { i -= 2; }
-                    } else { i--; }
+                    }
                 }
                 if (empty_count) {
                     if (p) {
