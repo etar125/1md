@@ -184,7 +184,7 @@ int main(int argc, char **argv) {
         }
         
         /* global */
-
+        
         bool is_bold          = false,
              is_italic        = false,
              is_underline     = false,
@@ -259,10 +259,10 @@ int main(int argc, char **argv) {
                 if (skip) { break; }
                 //if (skip_hr && i != 0) { i--; }
                 int spaces_count = 0;
-                while (!alr && (cur == ' ' || cur == '\t')) {
+                while (!alr && !is_code && (cur == ' ' || cur == '\t')) {
                     if (cur == ' ') {
                         spaces_count++;
-                        if (spaces_count == 3) {
+                        if (spaces_count == 4) {
                             spaces_count = 0;
                             indent_level++;
                         }
@@ -299,13 +299,22 @@ int main(int argc, char **argv) {
                 if (lvls_is_list[indent_level] && i == latest_list_i) {
                     list_cancel = false;
                 }
+                if (list_cancel && cur != '-' && cur != '*') {
+                    for (int i = 5; i >= indent_level; i--) {
+                        if (lvls_is_list[i]) {
+                            lvls_is_list[i] = false;
+                            printf("</li></%s>", lvls_nlist[i] ? "ol" : "ul");
+                            lvls_nlist[i] = false;
+                        }
+                    }
+                }
                 if (cur == '\\') {
                     i++;
                     if (!cur) { break; }
                     if ((add_br == 1 && !my_br) || add_br > 1) { add_br--; printf("<br>\n"); }
                     printch(cur);
                     alr = true;
-                } else if (!alr && cur == '#') {
+                } else if (!alr && !is_code && !is_list && cur == '#') {
                     h++;
                     if (p) {
                         p = false;
@@ -337,7 +346,7 @@ int main(int argc, char **argv) {
                     printf("</a></h%d>\n", h);
                     free(wp);
                     skip = true;
-                } else if (!alr && !skip_hr && (cur == '-' || cur == '_' || cur == '*')) {
+                } else if (!alr && !is_code && !is_list && !skip_hr && (cur == '-' || cur == '_' || cur == '*')) {
                     char a = cur;
                     i++;
                     dash = 1;
@@ -353,7 +362,7 @@ int main(int argc, char **argv) {
                         printf("<hr>\n");
                         break;
                     } else { skip_hr = true; i = (size_t)-1; continue; }
-                } else if (!alr && !skip_list && (cur == '-' || cur == '*' || is_digit(cur))) {
+                } else if (!alr && !is_code && !skip_list && (cur == '-' || cur == '*' || is_digit(cur))) {
                     for (int i = 5; i > indent_level; i--) {
                         if (lvls_is_list[i]) {
                             lvls_is_list[i] = false;
@@ -485,7 +494,7 @@ int main(int argc, char **argv) {
                             printf("</i>");
                         } else { printf("<i>"); }
                         is_italic = !is_italic;
-                    } else if (cur == '`') {
+                    } else if (!is_code && cur == '`') {
                         if (is_inline) {
                             printf("</code>");
                         } else { printf("<code>"); }
@@ -496,7 +505,7 @@ int main(int argc, char **argv) {
                             link_is_image = true;
                             i--;
                         } else { i--; printch(cur); }
-                    } else if (!skip_link && cur == '[') {
+                    } else if ((!is_inline && !is_code) && !skip_link && cur == '[') {
                         size_t end_text, start_link, end_link;
                         size_t t = i;
                         while (cur && cur != ']') { i++; }
@@ -529,7 +538,7 @@ int main(int argc, char **argv) {
                             i = end_link;
                             printf("\">");
                         }
-                    } else if (!skip_link && cur == ']') {
+                    } else if ((!is_inline && !is_code) && !skip_link && cur == ']') {
                         printf("</a>");
                         while (cur && cur != ')') { i++; }
                     }

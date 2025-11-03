@@ -250,12 +250,12 @@ cd vpc125
 make updtss
 make
 ```"
-    "<h1><a class=\"header-link\" id=\"vpc125\" href=\"#vpc125\">vpc125</a><h1>
+    "<h1><a class=\"header-link\" id=\"vpc125\" href=\"#vpc125\">vpc125</a></h1>
 <p>Это виртуальная машина, которую пишете вы на языке <a href=\"https://github.com/etar125/tinyss\">TinySS</a>.</p>
 
-<p><b>Проект находится на очень ранней стадии разработки!<b></p>
+<p><b>Проект находится на очень ранней стадии разработки!</b></p>
 
-<h2><a class=\"header-link\" id=\"TODO\" href=\"#TODO\">TODO</a><h2>
+<h2><a class=\"header-link\" id=\"TODO\" href=\"#TODO\">TODO</a></h2>
 
 <ul>
 <li><input type=\"checkbox\" checked=\"\" disabled=\"\"> Урезанная версия e125</li>
@@ -264,7 +264,7 @@ make
 <li>...</li>
 </ul>
 
-<h2><a class=\"header-link\" id=\"Сборка\" href=\"#Сборка\">Сборка</a><h2>
+<h2><a class=\"header-link\" id=\"Сборка\" href=\"#Сборка\">Сборка</a></h2>
 
 <pre><code class=\"language-sh\">
 git clone https://github.com/etar125/vpc125.git
@@ -295,6 +295,10 @@ foreach test $tests {
     set fd [open "${fn}.html" r]
     set output [ranl [read $fd]]
     set expected [ranl [lindex $test 2]]
+    close $fd
+    set fd [open "${fn}_o.html" w]
+    puts -nonewline $fd $output
+    close $fd
     if {$output == $expected} {
         puts "\033\[92mTest ${counter} passed\033\[0m"
     } else {
@@ -302,6 +306,9 @@ foreach test $tests {
             puts -nonewline "\033\[91m"
         } else { puts -nonewline "\033\[93m" }
         puts "Test ${counter} failed\033\[0m"
+        set fd [open "${fn}_e.html" w]
+        puts -nonewline $fd $expected
+        close $fd
     }
     incr counter
 }
