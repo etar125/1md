@@ -228,6 +228,51 @@ Code.  "
 <hr>
 <p>Последний раз список обновлялся 6 июля 2025</p>"
     }
+    {
+    0
+    "# vpc125
+Это виртуальная машина, которую пишете вы на языке \[TinySS\](https://github.com/etar125/tinyss).  
+
+**Проект находится на очень ранней стадии разработки!**  
+
+## TODO
+
+* \[x\] Урезанная версия e125
+* \[ \] ВМ
+* \[ \] Функции для работы с памятью
+* ...
+
+## Сборка
+
+```sh
+git clone https://github.com/etar125/vpc125.git
+cd vpc125
+make updtss
+make
+```"
+    "<h1><a class=\"header-link\" id=\"vpc125\" href=\"#vpc125\">vpc125</a><h1>
+<p>Это виртуальная машина, которую пишете вы на языке <a href=\"https://github.com/etar125/tinyss\">TinySS</a>.</p>
+
+<p><b>Проект находится на очень ранней стадии разработки!<b></p>
+
+<h2><a class=\"header-link\" id=\"TODO\" href=\"#TODO\">TODO</a><h2>
+
+<ul>
+<li><input type=\"checkbox\" checked=\"\" disabled=\"\"> Урезанная версия e125</li>
+<li><input type=\"checkbox\" disabled=\"\"> ВМ</li>
+<li><input type=\"checkbox\" disabled=\"\"> Функции для работы с памятью</li>
+<li>...</li>
+</ul>
+
+<h2><a class=\"header-link\" id=\"Сборка\" href=\"#Сборка\">Сборка</a><h2>
+
+<pre><code class=\"language-sh\">
+git clone https://github.com/etar125/vpc125.git
+cd vpc125
+make updtss
+make
+</code></pre>"
+    }
 }
 
 if {[file exists "tests.tmp"]} {
