@@ -231,7 +231,7 @@ Code.  "
 <p>Последний раз список обновлялся 6 июля 2025</p>"
     }
     {
-    0
+    1
     "# vpc125
 Это виртуальная машина, которую пишете вы на языке \[TinySS\](https://github.com/etar125/tinyss).  
 
@@ -274,6 +274,44 @@ cd vpc125
 make updtss
 make
 </code></pre>"
+    }
+    {
+    1
+    "# Что такое SimpleDraw?
+**SimpleDraw** - библиотека для работы с графикой, предназначенная для упрощения этой работы. Основана на \[SFD\](https://github.com/etar125/SFD).  
+На самом деле я просто захотел переписать либу и упростить себе разработку игрового движка.
+
+# Начало работы с SimpleDraw
+
+## Установка
+
+Для начала \[скачайте библиотеку\](https://github.com/etar125/SimpleDraw/releases).  
+Создайте проект Windows Forms:  
+!\[image\](https://github.com/etar125/SimpleDraw/assets/116297277/6d6db8a8-6acc-491d-ad36-02768c595bb2)
+!\[image\](https://github.com/etar125/SimpleDraw/assets/116297277/d35e818c-4493-47b0-8c9c-207ee8692b8c)  
+Добавьте ссылку на библиотеку:  
+!\[image\](https://github.com/etar125/SimpleDraw/assets/116297277/e7753bf9-6ce2-4706-b5b4-04f2724077a1)
+!\[YQCzWFD9vM\](https://github.com/etar125/SimpleDraw/assets/116297277/d670c937-c518-4366-80eb-0d538cbd1b69)  
+Присоедините её:
+```cs
+using SimpleDraw.Drawing;
+using SimpleDraw.Objects.Default;
+```"
+    "<h1><a class=\"header-link\" id=\"Что_такое_SimpleDraw_\" href=\"#Что_такое_SimpleDraw_\">Что такое SimpleDraw?</a></h1>
+<p><b>SimpleDraw</b> - библиотека для работы с графикой, предназначенная для упрощения этой работы. Основана на <a href=\"https://github.com/etar125/SFD\">SFD</a>.<br>
+На самом деле я просто захотел переписать либу и упростить себе разработку игрового движка.</p>
+<h1><a class=\"header-link\" id=\"Начало_работы_с_SimpleDraw\" href=\"#Начало_работы_с_SimpleDraw\">Начало работы с SimpleDraw</a></h1>
+<h2><a class=\"header-link\" id=\"Установка\" href=\"#Установка\">Установка</a></h2>
+<p>Для начала <a href=\"https://github.com/etar125/SimpleDraw/releases\">скачайте библиотеку</a>.<br>
+Создайте проект Windows Forms:<br>
+<img src=\"https://github.com/etar125/SimpleDraw/assets/116297277/6d6db8a8-6acc-491d-ad36-02768c595bb2\" alt=\"image\">
+<img src=\"https://github.com/etar125/SimpleDraw/assets/116297277/d35e818c-4493-47b0-8c9c-207ee8692b8c\" alt=\"image\"><br>
+Добавьте ссылку на библиотеку:<br>
+<img src=\"https://github.com/etar125/SimpleDraw/assets/116297277/e7753bf9-6ce2-4706-b5b4-04f2724077a1\" alt=\"image\">
+<img src=\"https://github.com/etar125/SimpleDraw/assets/116297277/d670c937-c518-4366-80eb-0d538cbd1b69\" alt=\"YQCzWFD9vM\"><br>
+Присоедините её:</p>
+<pre><code class=\"language-cs\">using SimpleDraw.Drawing;
+using SimpleDraw.Objects.Default;</code></pre>"
     }
 }
 

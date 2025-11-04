@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define VERSION "0.25.11_3"
+#define VERSION "0.25.11_4"
 #define BUFFSIZE 4096
 #define MAXSIZE 32768
 
@@ -455,8 +455,8 @@ int main(int argc, char **argv) {
                                 printch(cur);
                                 i++;
                             }
-                            printf("\">\n");
-                        } else { printf("<code>\n"); }
+                            printf("\">");
+                        } else { printf("<code>"); }
                         is_code = true;
                     } else {
                         is_code = false;
