@@ -1,0 +1,148 @@
+/*
+ * 1md
+ * Copyright (c) 2025-2026 etar125
+ * Licensed under ISC (see LICENSE)
+ */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <unistd.h>
+#include <e1_str.h>
+#include <e1_sarr.h>
+
+#define VERSION "0.1.0"
+//#define BUFFSIZE 32768
+
+char *progname;
+
+int usage() {
+    printf("1md v"VERSION"\n"
+           "Usage: %s file.md\n"
+           "Example:\n"
+           "  %s README.md > README.html\n",
+           progname, progname);
+    return 0;
+}
+
+str_t file, ln, end_cmds;
+size_t cur;
+
+int cmd(char *str) {
+    fprintf(stderr, "1cmd: Not implemented");
+    return 0;
+}
+
+int main(int argc, char **argv) {
+    int retcode = 1;
+    file = ln = end_cmds = emptystr();
+    cur = 0;
+    progname = argv[0];
+    char *filename = NULL;
+    if (argc < 2) { return usage(); }
+    for (int i = 1; i < argc; i++) {
+        filename = argv[i];
+    }
+    if (!filename) { return usage(); }
+    
+    FILE *f;
+    if (access(filename, F_OK) != 0) {
+        fprintf(stderr, "%s not found", filename);
+        goto error;
+    }
+    f = fopen(filename, "r");
+    if (!f) {
+        perror("File open error");
+        goto error;
+    }
+    
+    fseek(f, 0, SEEK_END);
+    size_t filesize = ftell(f);
+    rewind(f);
+    
+    char *buf = malloc(filesize + 1);
+    if (!buf) { goto error; }
+    
+    fread(buf, 1, filesize, f);
+    buf[filesize] = '\0';
+    file = cstr_to_str(buf, false);
+    
+    /* global options */
+    bool is_bold          = false,
+         is_italic        = false,
+         is_underline     = false,
+         is_strikethrough = false,
+         is_code          = false,
+         is_inline        = false,
+         is_list          = false,
+         nlist            = false;
+    int add_br = 0;
+    bool p = false;
+    int empty_count = 0;
+    int list_level = 0;
+    
+    bool lvls_nlist[6] = {
+        false, false, false, false, false, false
+    };
+    bool lvls_is_list[6] = {
+        false, false, false, false, false, false
+    };
+    
+    size_t latest_list_i = 0;
+    
+    #define dat ln.data
+    
+    for (; cur < sarr_count(&file); cur++) {
+        ln = sarr_getdup(&file, cur);
+        
+        if (ln.size == 0) { empty_count++; continue; }
+        if (!dat) { goto error; }
+        if (empty_count) {
+            empty_count = 0;
+            if (p) { p = false; puts("-p"); }
+        }
+        if (dat[0] == '?' && cmd(dat) != 0) {
+            goto error;
+        }
+        
+        #define dat ln.data
+        
+        bool started = false;
+        bool text = false;
+        size_t k = 0;
+        for (; k < ln.size; k++) {
+            if (!started) {
+                while (k < ln.size && (dat[k] == ' ' || dat[k] == '\t')) {
+                    k++;
+                } started = true;
+            }
+            if (!text) {
+                if (!p) { p = true; puts("+p"); }
+                text = true; printf("+text ");
+            }
+            if (dat[k] == ' ' && (ln.size - k) == 2 && dat[k + 1] == ' ') {
+                printf("\n+newline");
+                break;
+            }
+            printf("%c", dat[k]);
+        }
+        printf("\n");
+        
+        free(ln.data);
+        ln.data = NULL;
+        ln.size = 0;
+    }
+    
+    if (p) {
+        puts("-p");
+    }
+    
+    retcode = 0;
+error:
+    if (retcode) { fprintf(stderr, "err\n"); }
+    if (file.data) { free(file.data); }
+    if (ln.data) { free(ln.data); }
+    if (end_cmds.data) { free(end_cmds.data); }
+    if (f) { fclose(f); }
+    return retcode;
+}
