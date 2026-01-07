@@ -11,7 +11,7 @@
 #include <e1_str.h>
 #include <e1_sarr.h>
 
-#define VERSION "0.1.0"
+#define VERSION "0.1.1"
 //#define BUFFSIZE 32768
 
 char *progname;
@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
     buf[filesize] = '\0';
     file = cstr_to_str(buf, false);
     
-    /* global options */
+    /* OLD */
     bool is_bold          = false,
          is_italic        = false,
          is_underline     = false,
@@ -77,7 +77,6 @@ int main(int argc, char **argv) {
          is_list          = false,
          nlist            = false;
     int add_br = 0;
-    bool p = false;
     int empty_count = 0;
     int list_level = 0;
     
@@ -90,7 +89,10 @@ int main(int argc, char **argv) {
     
     size_t latest_list_i = 0;
     
+    /* =-=-=-=-=-=-=-= */
+    
     #define dat ln.data
+    bool p = false;
     
     for (; cur < sarr_count(&file); cur++) {
         ln = sarr_getdup(&file, cur);
@@ -105,8 +107,6 @@ int main(int argc, char **argv) {
             goto error;
         }
         
-        #define dat ln.data
-        
         bool started = false;
         bool text = false;
         size_t k = 0;
@@ -115,6 +115,17 @@ int main(int argc, char **argv) {
                 while (k < ln.size && (dat[k] == ' ' || dat[k] == '\t')) {
                     k++;
                 } started = true;
+            }
+            if (dat[k] == '-') {
+                char ch = dat[k];
+                size_t start = k;
+                while (k < ln.size && dat[k] == ch) { k++; }
+                if (dat[k] != '\0') { k = start; }
+                else {
+                    if (p) { p = false; puts("-p"); }
+                    printf("+hr");
+                    break;
+                }
             }
             if (!text) {
                 if (!p) { p = true; puts("+p"); }
