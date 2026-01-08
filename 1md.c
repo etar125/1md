@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
     
     #define dat ln.data
     bool p = false;
-    bool newline = false;;
+    bool newline = false;
     
     for (; cur < sarr_count(&file); cur++) {
         ln = sarr_getdup(&file, cur);
