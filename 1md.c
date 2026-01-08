@@ -11,7 +11,7 @@
 #include <e1_str.h>
 #include <e1_sarr.h>
 
-#define VERSION "0.1.1"
+#define VERSION "0.1.2"
 //#define BUFFSIZE 32768
 
 char *progname;
@@ -68,6 +68,7 @@ int main(int argc, char **argv) {
     file = cstr_to_str(buf, false);
     
     /* OLD */
+    /*
     bool is_bold          = false,
          is_italic        = false,
          is_underline     = false,
@@ -88,11 +89,12 @@ int main(int argc, char **argv) {
     };
     
     size_t latest_list_i = 0;
-    
+    */
     /* =-=-=-=-=-=-=-= */
     
     #define dat ln.data
     bool p = false;
+    bool newline = false;;
     
     for (; cur < sarr_count(&file); cur++) {
         ln = sarr_getdup(&file, cur);
@@ -101,6 +103,7 @@ int main(int argc, char **argv) {
         if (!dat) { goto error; }
         if (empty_count) {
             empty_count = 0;
+            newline = false;
             if (p) { p = false; puts("-p"); }
         }
         if (dat[0] == '?' && cmd(dat) != 0) {
@@ -129,10 +132,11 @@ int main(int argc, char **argv) {
             }
             if (!text) {
                 if (!p) { p = true; puts("+p"); }
+                if (newline) { newline = false; puts("+newline"); }
                 text = true; printf("+text ");
             }
             if (dat[k] == ' ' && (ln.size - k) == 2 && dat[k + 1] == ' ') {
-                printf("\n+newline");
+                newline = true;
                 break;
             }
             printf("%c", dat[k]);
