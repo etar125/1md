@@ -11,7 +11,7 @@
 #include <e1_str.h>
 #include <e1_sarr.h>
 
-#define VERSION "0.1.2"
+#define VERSION "0.1.3"
 //#define BUFFSIZE 32768
 
 char *progname;
@@ -95,6 +95,9 @@ int main(int argc, char **argv) {
     #define dat ln.data
     bool p = false;
     bool newline = false;
+    int empty_count = 0;
+    bool bold = false;
+    bool italic = false;
     
     for (; cur < sarr_count(&file); cur++) {
         ln = sarr_getdup(&file, cur);
@@ -129,6 +132,18 @@ int main(int argc, char **argv) {
                     printf("+hr");
                     break;
                 }
+            }
+            if (dat[k] == '\\') {
+                if (!text) {
+                    if (!p) { p = true; puts("+p"); }
+                    if (newline) { newline = false; puts("+newline"); }
+                    text = true; printf("+text ");
+                }
+                if (k + 1 != ln.size) {
+                    printf("%c", dat[k + 1]);
+                    k++;
+                }
+                continue;
             }
             if (!text) {
                 if (!p) { p = true; puts("+p"); }
