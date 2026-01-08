@@ -11,8 +11,7 @@
 #include <e1_str.h>
 #include <e1_sarr.h>
 
-#define VERSION "0.1.3"
-//#define BUFFSIZE 32768
+#define VERSION "0.2.0"
 
 char *progname;
 
@@ -20,7 +19,7 @@ int usage() {
     printf("1md v"VERSION"\n"
            "Usage: %s file.md\n"
            "Example:\n"
-           "  %s README.md > README.html\n",
+           "  %s README.md > README.1md\n",
            progname, progname);
     return 0;
 }
@@ -39,13 +38,13 @@ int main(int argc, char **argv) {
     cur = 0;
     progname = argv[0];
     char *filename = NULL;
-    if (argc < 2) { return usage(); }
+    if (argc != 2) { return usage(); }
     for (int i = 1; i < argc; i++) {
         filename = argv[i];
     }
     if (!filename) { return usage(); }
     
-    FILE *f;
+    FILE *f = NULL;
     if (access(filename, F_OK) != 0) {
         fprintf(stderr, "%s not found", filename);
         goto error;
@@ -122,33 +121,54 @@ int main(int argc, char **argv) {
                     k++;
                 } started = true;
             }
-            if (dat[k] == '-') {
-                char ch = dat[k];
-                size_t start = k;
-                while (k < ln.size && dat[k] == ch) { k++; }
-                if (dat[k] != '\0') { k = start; }
-                else {
-                    if (p) { p = false; puts("-p"); }
-                    printf("+hr");
-                    break;
+            if (!text) {
+                if (dat[k] == '-') {
+                    char ch = dat[k];
+                    size_t start = k;
+                    while (k < ln.size && dat[k] == ch) { k++; }
+                    if (dat[k] != '\0') { k = start; }
+                    else {
+                        if (p) { p = false; puts("-p"); }
+                        printf("+hr");
+                        break;
+                    }
                 }
             }
-            if (dat[k] == '\\') {
-                if (!text) {
-                    if (!p) { p = true; puts("+p"); }
-                    if (newline) { newline = false; puts("+newline"); }
-                    text = true; printf("+text ");
-                }
-                if (k + 1 != ln.size) {
-                    printf("%c", dat[k + 1]);
+            if (dat[k] == '*') {
+                if (text) { printf("\n"); }
+                if (!p) { p = true; puts("+p"); }
+                if (newline) { newline = false; puts("+newline"); }
+                if (k + 1 != ln.size && dat[k + 1] == '*') {
                     k++;
+                    if (bold) { bold = false; puts("-bold"); }
+                    else { bold = true; puts("+bold"); }
+                } else {
+                    if (italic) { italic = false; puts("-italic"); }
+                    else { italic = true; puts("+italic"); }
                 }
+                text = true;
+                printf("+text ");
+                continue;
+            }
+            if (dat[k] == '$') {
+                if (text) { printf("\n"); }
+                if (!p) { p = true; puts("+p"); }
+                if (newline) { newline = false; puts("+newline"); }
+                if (italic) { italic = false; puts("-italic"); }
+                else { italic = true; puts("+italic"); }
+                text = true;
+                printf("+text ");
                 continue;
             }
             if (!text) {
                 if (!p) { p = true; puts("+p"); }
                 if (newline) { newline = false; puts("+newline"); }
                 text = true; printf("+text ");
+            }
+            if (dat[k] == '\\' && k + 1 != ln.size) {
+                printf("%c", dat[k + 1]);
+                k++;
+                continue;
             }
             if (dat[k] == ' ' && (ln.size - k) == 2 && dat[k + 1] == ' ') {
                 newline = true;
