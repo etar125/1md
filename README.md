@@ -6,7 +6,7 @@
 ## Сборка
 
 Нужны:
-- Компилятор C
+- GCC
 - sh
 - [e1l](https://github.com/etar125/e1l)
 
