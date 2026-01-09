@@ -11,7 +11,7 @@
 #include <e1_str.h>
 #include <e1_sarr.h>
 
-#define VERSION "0.3.1"
+#define VERSION "0.3.2"
 #define error(x) retplace = x; goto error
 
 char *progname;
@@ -79,9 +79,14 @@ int main(int argc, char **argv) {
         if (strcmp(cmd.data, "+p") == 0) { puts("<p>"); }
         else if (strcmp(cmd.data, "-p") == 0) { puts("</p>"); }
         else if (strcmp(cmd.data, "+text") == 0) {
-            // Надо по символам читать строку и экранизировать что надо
-            if (cmdend + 1 < ln.size) {
-                printf("%s", &dat[cmdend + 1]);
+            for (size_t i = cmdend + 1; i < ln.size; i++) {
+                switch (dat[i]) {
+                    case '&': printf("&amp;"); break;
+                    case '<': printf("&lt;"); break;
+                    case '>': printf("&gt;"); break;
+                    case '"': printf("&quot;"); break;
+                    default: printf("%c", dat[i]);
+                }
             }
         } else if (strcmp(cmd.data, "+bold") == 0) { printf("<b>"); }
         else if (strcmp(cmd.data, "-bold") == 0) { printf("</b>"); }

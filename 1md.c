@@ -11,7 +11,7 @@
 #include <e1_str.h>
 #include <e1_sarr.h>
 
-#define VERSION "0.3.1"
+#define VERSION "0.3.2"
 #define error(x) retplace = x; goto error
 
 char *progname;
