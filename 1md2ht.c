@@ -11,7 +11,7 @@
 #include <e1_str.h>
 #include <e1_sarr.h>
 
-#define VERSION "0.3.2"
+#define VERSION "0.3.3"
 #define error(x) retplace = x; goto error
 
 char *progname;
@@ -95,6 +95,7 @@ int main(int argc, char **argv) {
         else if (strcmp(cmd.data, "+hr") == 0) { puts("<hr>"); }
         else if (strcmp(cmd.data, "+newline") == 0) { puts("<br>"); }
         else if (strcmp(cmd.data, "+eol") == 0) { puts(""); }
+        else if (strcmp(cmd.data, "+h") == 0) { }
         else {
             fprintf(stderr, "unknown command '%s'\n", cmd.data);
             error(99);

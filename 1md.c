@@ -11,7 +11,7 @@
 #include <e1_str.h>
 #include <e1_sarr.h>
 
-#define VERSION "0.3.2"
+#define VERSION "0.3.3"
 #define error(x) retplace = x; goto error
 
 char *progname;
@@ -129,20 +129,29 @@ int main(int argc, char **argv) {
                     char ch = dat[k];
                     size_t start = k;
                     while (k < ln.size && dat[k] == ch) { k++; }
-                    if (dat[k] != '\0') { k = start; }
+                    if (dat[k] != '\0') { k = start; goto skipnt; }
                     else {
                         if (p) { p = false; puts("-p"); }
                         printf("+hr");
                         break;
                     }
+                } else if (dat[k] == '#') {
+                    if (p) { p = false; puts("-p"); }
+                    int hlvl = 0;
+                    while (k < ln.size && dat[k] == '#') { k++, hlvl++; }
+                    if (hlvl > 6) { hlvl = 6; }
+                    if (k + 2 < ln.size) {
+                        k++;
+                        printf("+h %d %s", hlvl, &dat[k]);
+                    }
+                    break;
                 }
-                
                 else {
+skipnt:
                     if (!p) { p = true; puts("+p"); }
                     if (newline) { newline = false; puts("+newline"); }
                     text = true;
                     k--;
-                    continue;
                 }
             } else {
                 if (dat[k] == '*') {
