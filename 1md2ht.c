@@ -11,7 +11,8 @@
 #include <e1_str.h>
 #include <e1_sarr.h>
 
-#define VERSION "0.2.0"
+#define VERSION "0.2.1"
+#define error(x) retplace = x; goto error
 
 char *progname;
 
@@ -26,6 +27,7 @@ int usage() {
 
 int main(int argc, char **argv) {
     int retcode = 1;
+    int retplace = 0;
     progname = argv[0];
     char *filename = NULL;
     str_t file, ln, cmd;
@@ -40,12 +42,12 @@ int main(int argc, char **argv) {
     FILE *f = NULL;
     if (access(filename, F_OK) != 0) {
         fprintf(stderr, "%s not found", filename);
-        goto error;
+        error(0);
     }
     f = fopen(filename, "r");
     if (!f) {
         perror("File open error");
-        goto error;
+        error(1);
     }
     
     fseek(f, 0, SEEK_END);
@@ -53,7 +55,7 @@ int main(int argc, char **argv) {
     rewind(f);
     
     char *buf = malloc(filesize + 1);
-    if (!buf) { goto error; }
+    if (!buf) { error(2); }
     
     fread(buf, 1, filesize, f);
     buf[filesize] = '\0';
@@ -64,13 +66,13 @@ int main(int argc, char **argv) {
     for (; cur < sarr_count(&file); cur++) {
         ln = sarr_getdup(&file, cur);
         if (ln.size == 0) { continue; }
-        if (!dat) { goto error; }
+        if (!dat) { error(3); }
         size_t cmdend = 0;
         while (cmdend < ln.size && dat[cmdend] != ' ') { cmdend++; }
         cmd = emptystr();
         cmd.size = cmdend;
         cmd.data = malloc(cmdend + 1);
-        if (cmd.data) { goto error; }
+        if (!cmd.data) { error(4); }
         memcpy(cmd.data, dat, cmdend);
         cmd.data[cmdend] = '\0';
         
@@ -86,7 +88,7 @@ int main(int argc, char **argv) {
         else if (strcmp(cmd.data, "+italic") == 0) { puts("<i>"); }
         else if (strcmp(cmd.data, "-italic") == 0) { puts("</i>"); }
         else if (strcmp(cmd.data, "+hr") == 0) { puts("<hr>"); }
-        else if (strcmp(cmd.data, "+br") == 0) { puts("<br>"); }
+        else if (strcmp(cmd.data, "+newline") == 0) { puts("<br>"); }
         else {
             // Тут должна быть ошибка о неизвестной команде
         }
@@ -99,7 +101,7 @@ int main(int argc, char **argv) {
     
     retcode = 0;
 error:
-    if (retcode) { fprintf(stderr, "err\n"); }
+    if (retcode) { fprintf(stderr, "err %d\n", retplace); }
     if (file.data) { free(file.data); }
     if (ln.data) { free(ln.data); }
     if (cmd.data) { free(cmd.data); }
