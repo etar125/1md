@@ -11,7 +11,7 @@
 #include <e1_str.h>
 #include <e1_sarr.h>
 
-#define VERSION "0.2.2"
+#define VERSION "0.3.0"
 #define error(x) retplace = x; goto error
 
 char *progname;
@@ -115,13 +115,14 @@ int main(int argc, char **argv) {
         }
         
         bool started = false;
+        bool skipws = false;
         bool text = false;
         size_t k = 0;
         for (; k < ln.size; k++) {
-            if (!started) {
+            if (!skipws) {
                 while (k < ln.size && (dat[k] == ' ' || dat[k] == '\t')) {
                     k++;
-                } started = true;
+                } skipws = true;
             }
             if (!text) {
                 if (dat[k] == '-') {
@@ -135,48 +136,45 @@ int main(int argc, char **argv) {
                         break;
                     }
                 }
-            }
-            if (dat[k] == '*') {
-                if (text) { printf("\n"); }
-                if (!p) { p = true; puts("+p"); }
-                if (newline) { newline = false; puts("+newline"); }
-                if (k + 1 != ln.size && dat[k + 1] == '*') {
-                    k++;
-                    if (bold) { bold = false; puts("-bold"); }
-                    else { bold = true; puts("+bold"); }
-                } else {
+                
+                else {
+                    if (!p) { p = true; puts("+p"); }
+                    if (newline) { newline = false; puts("+newline"); }
+                    text = true;
+                    k--;
+                    continue;
+                }
+            } else {
+                if (dat[k] == '*') {
+                    if (started) { started = false; printf("\n"); }
+                    if (k + 1 != ln.size && dat[k + 1] == '*') {
+                        k++;
+                        if (bold) { bold = false; puts("-bold"); }
+                        else { bold = true; puts("+bold"); }
+                    } else {
+                        if (italic) { italic = false; puts("-italic"); }
+                        else { italic = true; puts("+italic"); }
+                    }
+                    //printf("+text ");
+                } else if (dat[k] == '$') {
+                    if (started) { started = false; printf("\n"); }
                     if (italic) { italic = false; puts("-italic"); }
                     else { italic = true; puts("+italic"); }
+                    //printf("+text ");
+                } else if (dat[k] == '\\' && k + 1 != ln.size) {
+                    if (!started) { started = true; printf("+text "); }
+                    printf("%c", dat[k + 1]);
+                    k++;
+                } else if (dat[k] == ' ' && (ln.size - k) == 2 && dat[k + 1] == ' ') {
+                    newline = true;
+                    break;
                 }
-                text = true;
-                printf("+text ");
-                continue;
+                
+                else {
+                    if (!started) { started = true; printf("+text "); }
+                    printf("%c", dat[k]);
+                }
             }
-            if (dat[k] == '$') {
-                if (text) { printf("\n"); }
-                if (!p) { p = true; puts("+p"); }
-                if (newline) { newline = false; puts("+newline"); }
-                if (italic) { italic = false; puts("-italic"); }
-                else { italic = true; puts("+italic"); }
-                text = true;
-                printf("+text ");
-                continue;
-            }
-            if (!text) {
-                if (!p) { p = true; puts("+p"); }
-                if (newline) { newline = false; puts("+newline"); }
-                text = true; printf("+text ");
-            }
-            if (dat[k] == '\\' && k + 1 != ln.size) {
-                printf("%c", dat[k + 1]);
-                k++;
-                continue;
-            }
-            if (dat[k] == ' ' && (ln.size - k) == 2 && dat[k + 1] == ' ') {
-                newline = true;
-                break;
-            }
-            printf("%c", dat[k]);
         }
         printf("\n");
         if (text) { puts("+eol"); }
