@@ -11,7 +11,7 @@
 #include <e1_str.h>
 #include <e1_sarr.h>
 
-#define VERSION "0.3.0"
+#define VERSION "0.3.1"
 #define error(x) retplace = x; goto error
 
 char *progname;
@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
     
     retcode = 0;
 error:
-    if (retcode) { fprintf(stderr, "err %d\n", retplace); }
+    if (retcode) { fprintf(stderr, "err %d line %zu\n", retplace, cur + 1); }
     if (file.data) { free(file.data); }
     if (ln.data) { free(ln.data); }
     if (cmd.data) { free(cmd.data); }
