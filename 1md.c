@@ -11,7 +11,7 @@
 #include <e1_str.h>
 #include <e1_sarr.h>
 
-#define VERSION "0.2.1"
+#define VERSION "0.2.2"
 #define error(x) retplace = x; goto error
 
 char *progname;
@@ -179,6 +179,7 @@ int main(int argc, char **argv) {
             printf("%c", dat[k]);
         }
         printf("\n");
+        if (text) { puts("+eol"); }
         
         free(ln.data);
         ln.data = NULL;

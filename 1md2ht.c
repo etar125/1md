@@ -11,7 +11,7 @@
 #include <e1_str.h>
 #include <e1_sarr.h>
 
-#define VERSION "0.2.1"
+#define VERSION "0.2.2"
 #define error(x) retplace = x; goto error
 
 char *progname;
@@ -81,16 +81,18 @@ int main(int argc, char **argv) {
         else if (strcmp(cmd.data, "+text") == 0) {
             // Надо по символам читать строку и экранизировать что надо
             if (cmdend + 1 < ln.size) {
-                printf("%s\n", &dat[cmdend + 1]);
+                printf("%s", &dat[cmdend + 1]);
             }
-        } else if (strcmp(cmd.data, "+bold") == 0) { puts("<b>"); }
-        else if (strcmp(cmd.data, "-bold") == 0) { puts("</b>"); }
-        else if (strcmp(cmd.data, "+italic") == 0) { puts("<i>"); }
-        else if (strcmp(cmd.data, "-italic") == 0) { puts("</i>"); }
+        } else if (strcmp(cmd.data, "+bold") == 0) { printf("<b>"); }
+        else if (strcmp(cmd.data, "-bold") == 0) { printf("</b>"); }
+        else if (strcmp(cmd.data, "+italic") == 0) { printf("<i>"); }
+        else if (strcmp(cmd.data, "-italic") == 0) { printf("</i>"); }
         else if (strcmp(cmd.data, "+hr") == 0) { puts("<hr>"); }
         else if (strcmp(cmd.data, "+newline") == 0) { puts("<br>"); }
+        else if (strcmp(cmd.data, "+eol") == 0) { puts(""); }
         else {
-            // Тут должна быть ошибка о неизвестной команде
+            fprintf(stderr, "unkown command '%s'\n", cmd.data);
+            error(99);
         }
         
         free(ln.data);
