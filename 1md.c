@@ -11,8 +11,7 @@
 #include <e1_str.h>
 #include <e1_sarr.h>
 
-#define VERSION "0.3.3"
-#define error(x) retplace = x; goto error
+#include "1info.h"
 
 char *progname;
 
@@ -34,8 +33,7 @@ int cmd(char *str) {
 }
 
 int main(int argc, char **argv) {
-    int retcode = 1;
-    int retplace = 0;
+    err retcode = 1;
     file = ln = end_cmds = emptystr();
     cur = 0;
     progname = argv[0];
@@ -48,13 +46,13 @@ int main(int argc, char **argv) {
     
     FILE *f = NULL;
     if (access(filename, F_OK) != 0) {
-        fprintf(stderr, "%s not found", filename);
-        error(0);
+        fprintf(stderr, "can't access %s", filename);
+        error(ERR_FILE_ACCESS);
     }
     f = fopen(filename, "r");
     if (!f) {
         perror("File open error");
-        error(1);
+        error(ERR_FILE_OPEN);
     }
     
     fseek(f, 0, SEEK_END);
@@ -62,7 +60,7 @@ int main(int argc, char **argv) {
     rewind(f);
     
     char *buf = malloc(filesize + 1);
-    if (!buf) { error(2); }
+    if (!buf) { error(ERR_MALLOC); }
     
     fread(buf, 1, filesize, f);
     buf[filesize] = '\0';
@@ -104,14 +102,14 @@ int main(int argc, char **argv) {
         ln = sarr_getdup(&file, cur);
         
         if (ln.size == 0) { empty_count++; continue; }
-        if (!dat) { error(3); }
+        if (!dat) { error(ERR_MALLOC); }
         if (empty_count) {
             empty_count = 0;
             newline = false;
             if (p) { p = false; puts("-p"); }
         }
         if (dat[0] == '?' && cmd(dat) != 0) {
-            error(4);
+            error(ERR_CMD_ERROR);
         }
         
         bool started = false;
@@ -199,7 +197,7 @@ skipnt:
     
     retcode = 0;
 error:
-    if (retcode) { fprintf(stderr, "err %d line %zu\n", retplace, cur + 1); }
+    if (retcode) { fprintf(stderr, "err %d line %zu\n", retcode, cur + 1); }
     if (file.data) { free(file.data); }
     if (ln.data) { free(ln.data); }
     if (end_cmds.data) { free(end_cmds.data); }
