@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
     FILE *f = NULL;
     if (access(filename, F_OK) != 0) {
         fprintf(stderr, "can't access %s", filename);
-        perror();
+        perror("");
         error(ERR_FILE_ACCESS);
     }
     f = fopen(filename, "r");
@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
             size_t sz = lvlend - cmdend;
             char *t = malloc(sz + 1);
             if (!t) { error(ERR_MALLOC); }
-            memcpy(t, dat[cmdend + 1], sz);
+            memcpy(t, &dat[cmdend + 1], sz);
             t[sz] = '\0';
             int lvl = atoi(t);
             free(t);

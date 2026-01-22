@@ -4,8 +4,8 @@
  * Licensed under ISC (see LICENSE)
  */
 
-#ifndef 1INFO_H
-#deifne 1INFO_H
+#ifndef _1INFO_H
+#define _1INFO_H
 
 typedef enum {
     ERR_OK = 0,
