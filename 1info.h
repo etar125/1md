@@ -22,5 +22,6 @@ typedef enum {
 
 #define VERSION "0.3.3"
 #define error(x) retcode = x; goto error
+#define log(x) fprintf(stderr, x)
 
 #endif

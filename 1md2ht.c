@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
         else if (strcmp(cmd.data, "+eol") == 0) { puts(""); }
         else if (strcmp(cmd.data, "+h") == 0) {
             size_t lvlend = cmdend + 1;
-            while (lvlend < ln.size && dat[lvlend] != ' ') { cmdend++; }
+            while (lvlend < ln.size && dat[lvlend] != ' ') { lvlend++; }
             if (lvlend - 1 == cmdend || lvlend + 1 >= ln.size) { error(ERR_BAD_SYNTAX); }
             
             size_t sz = lvlend - cmdend;
