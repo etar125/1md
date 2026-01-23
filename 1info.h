@@ -20,7 +20,7 @@ typedef enum {
     ERR_CMD_ERROR
 } err;
 
-#define VERSION "0.3.3"
+#define VERSION "0.3.4"
 #define error(x) retcode = x; goto error
 #define log(x) fprintf(stderr, x)
 

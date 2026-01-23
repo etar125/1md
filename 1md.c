@@ -27,8 +27,37 @@ int usage() {
 str_t file, ln, end_cmds;
 size_t cur;
 
-int cmd(char *str) {
-    fprintf(stderr, "1cmd: Not implemented");
+int cmd(str_t *ln, size_t start) {
+    char *l = ln->data;
+    size_t sz = ln->size;
+    if (!l || start >= sz) {
+        fprintf(stderr, "1cmd: bad args");
+        return 1;
+    }
+    #define dat l
+    str_t cmd = emptystr();
+    size_t cmdend = start;
+    while (cmdend < sz && dat[cmdend] != ' ') { cmdend++; }
+    if (cmdend == start) {
+        fprintf(stderr, "1cmd: command is missing");
+        return 1;
+    }
+    cmd.size = cmdend - start;
+    cmd.data = malloc(cmd.size + 1);
+    if (!cmd.data) {
+        fprintf(stderr, "1cmd: malloc error");
+        return 1;
+    }
+    memcpy(cmd.data, &dat[start], cmd.size);
+    cmd.data[cmd.size] = '\0';
+    
+    if (strcmp(cmd.data, "raw") == 0) {
+        cmdend++;
+        while (cmdend < sz) { printf("%c", dat[cmdend]); }
+    } else {
+        fprintf(stderr, "1cmd: unknown command '%s'", cmd.data);
+    }
+    
     return 0;
 }
 
@@ -108,7 +137,7 @@ int main(int argc, char **argv) {
             newline = false;
             if (p) { p = false; puts("-p"); }
         }
-        if (dat[0] == '?' && cmd(dat) != 0) {
+        if (dat[0] == '?' && cmd(&ln, 0) != 0) {
             error(ERR_CMD_ERROR);
         }
         
