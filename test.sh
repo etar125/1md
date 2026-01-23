@@ -1,5 +1,5 @@
 #!/bin/sh
-./build.sh
+./build.sh || exit 1
 ./1md test.md > test.1md
 ./1md2ht test.1md > test.html
 cat > fulltest.html << EOF
