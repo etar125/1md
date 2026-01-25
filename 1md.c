@@ -149,6 +149,7 @@ int main(int argc, char **argv) {
         bool skipws = false;
         bool text = false;
         size_t k = 0;
+        bool addnl = false;
         for (; k < ln.size; k++) {
             if (!skipws) {
                 while (k < ln.size && (dat[k] == ' ' || dat[k] == '\t')) {
@@ -163,7 +164,7 @@ int main(int argc, char **argv) {
                     if (dat[k] != '\0') { k = start; goto skipnt; }
                     else {
                         if (p) { p = false; puts("-p"); }
-                        printf("+hr");
+                        printf("+hr\n");
                         break;
                     }
                 } else if (dat[k] == '#') {
@@ -175,6 +176,7 @@ int main(int argc, char **argv) {
                         k++;
                         printf("+h %d %s", hlvl, &dat[k]);
                     }
+                    puts("");
                     break;
                 }
                 else {
@@ -186,6 +188,7 @@ skipnt:
                 }
             } else {
                 if (dat[k] == '*') {
+                    addnl = false;
                     if (started) { started = false; printf("\n"); }
                     if (k + 1 != ln.size && dat[k + 1] == '*') {
                         k++;
@@ -195,12 +198,11 @@ skipnt:
                         if (italic) { italic = false; puts("-italic"); }
                         else { italic = true; puts("+italic"); }
                     }
-                    //printf("+text ");
                 } else if (dat[k] == '$') {
+                    addnl = false;
                     if (started) { started = false; printf("\n"); }
                     if (italic) { italic = false; puts("-italic"); }
                     else { italic = true; puts("+italic"); }
-                    //printf("+text ");
                 } else if (dat[k] == '\\' && k + 1 != ln.size) {
                     if (!started) { started = true; printf("+text "); }
                     printf("%c", dat[k + 1]);
@@ -213,10 +215,11 @@ skipnt:
                 else {
                     if (!started) { started = true; printf("+text "); }
                     printf("%c", dat[k]);
+                    addnl = true;
                 }
             }
         }
-        printf("\n");
+        if (addnl) { printf("\n"); }
         if (text) { puts("+eol"); }
         
         free(ln.data);
