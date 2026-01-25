@@ -1,4 +1,4 @@
-#!/bin/env tclsh
+#!/bin/tclsh
 # 1md tests
 # Copyright (c) 2026 etar125
 # Licensed under ISC (see LICENSE)
@@ -41,7 +41,6 @@ $Курсив*, шекели**.**"
 +bold
 +text .
 -bold
-
 +eol
 -p
 "
@@ -60,7 +59,7 @@ foreach test $tests {
     set fd [open "${fn}.md" w]
     puts $fd [lindex $test 1]
     close $fd
-    if {[catch {exec $bin "${fn}.md" > "${fn}.1md"} error_msg]} {
+    if {[catch {exec {*}$bin "${fn}.md" > "${fn}.1md"} error_msg]} {
         puts "test ${counter}: ${error_msg}"
         incr counter
         continue
