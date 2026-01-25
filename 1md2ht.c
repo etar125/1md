@@ -152,7 +152,7 @@ int main(int argc, char **argv) {
                     default: printf("%c", dat[i]);
                 }
             }
-            printf("</a></h%d>", lvl);
+            printf("</a></h%d>\n", lvl);
             free(nid.data);
         }
         else {
