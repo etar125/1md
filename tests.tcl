@@ -4,6 +4,10 @@
 # Licensed under ISC (see LICENSE)
 
 set bin [lindex $argv 0]
+if {$bin == ""} {
+    puts "укажи путь к бинарнику (учти, что запускает в tests.tmp)"
+    exit 1
+}
 
 set tests {
     {
@@ -45,6 +49,66 @@ $Курсив*, шекели**.**"
 -p
 "
     }
+    {
+    1
+    "Список:
+- Elem 1
+- Multi
+line
+ elem 2
+  - Под
+   список
+   **1**  
+  Ага
+- Уже нет
+.
+
+Конец!"
+    "+p
++text Список:
++eol
+-p
++list
++el
++text Elem 1
++eol
+-el
++el
++text Multi
++eol
++text line
++eol
++text elem 2
++eol
++list
++el
++text Под
++eol
++text список
++eol
++bold
++text 1
+-bold
++eol
++newline
++text Ага
++eol
+-el
+-list
+-el
++el
++text Уже нет
++eol
++text .
++eol
+-el
+-list
++p
++text Конец!
++eol
+-p
+"
+    }
 }
 
 if {[file exists "tests.tmp"]} {
@@ -59,7 +123,7 @@ foreach test $tests {
     set fd [open "${fn}.md" w]
     puts -nonewline $fd [lindex $test 1]
     close $fd
-    if {[catch {exec {*}$bin "${fn}.md" > "${fn}.1md"} error_msg]} {
+    if {[catch {exec $bin "${fn}.md" > "${fn}.1md"} error_msg]} {
         puts "test ${counter}: ${error_msg}"
         incr counter
         continue
