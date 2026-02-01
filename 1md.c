@@ -127,9 +127,18 @@ int main(int argc, char **argv) {
     #define dat ln.data
     bool p = false;
     bool newline = false;
+    //int newline = 0;
     int empty_count = 0;
     bool bold = false;
     bool italic = false;
+    int listlvl = -1;
+    #define MAXLISTLVL 6
+    bool numl[MAXLISTLVL];
+    bool listarted[MAXLISTLVL];
+    size_t liststart[MAXLISTLVL];
+    for (int i = 0; i < MAXLISTLVL; i++) {
+        numl[i] = false, liststart[i] = 0, listarted[i] = 0;
+    }
     
     for (; cur < sarr_count(&file); cur++) {
         ln = sarr_getdup(&file, cur);
@@ -140,6 +149,16 @@ int main(int argc, char **argv) {
             empty_count = 0;
             newline = false;
             if (p) { p = false; puts("-p"); }
+            while (listlvl != -1) {
+                if (listarted[listlvl]) {
+                    listarted[listlvl] = false;
+                    puts("-el");
+                }
+                puts(numl[listlvl] ? "-nlist" : "-list");
+                numl[listlvl] = false;
+                liststart[listlvl] = 0;
+                listlvl--;
+            }
         }
         if (dat[0] == '?' && cmd(&ln) != 0) {
             error(ERR_CMD_ERROR);
@@ -156,12 +175,55 @@ int main(int argc, char **argv) {
                     k++;
                 } skipws = true;
             }
+            while (listlvl > -1 && k < liststart[listlvl]) {
+                if (listarted[listlvl]) {
+                    listarted[listlvl] = false;
+                    puts("-el");
+                }
+                puts(numl[listlvl] ? "-nlist" : "-list");
+                numl[listlvl] = false;
+                liststart[listlvl] = 0;
+                listlvl--;
+            }
             if (!text) {
                 if (dat[k] == '-') {
                     char ch = dat[k];
                     size_t start = k;
                     while (k < ln.size && dat[k] == ch) { k++; }
-                    if (dat[k] != '\0') { k = start; goto skipnt; }
+                    if (dat[k] != '\0') {
+                        if (p) { p = false; puts("-p"); }
+                        newline = false;
+                        if (k - start == 1 && dat[k] == ' ') {
+                            k++;
+                            if (listlvl > -1) {
+                                if (liststart[listlvl] == start) {
+                                    if (listarted[listlvl]) {
+                                        puts("-el");
+                                    }
+                                    if (numl[listlvl]) {
+                                        puts("-nlist");
+                                        puts("+list");
+                                    }
+                                    puts("+el");
+                                    goto skipnt;
+                                } else if (start - liststart[listlvl] >= 4) {
+                                    if (listlvl == 5) {
+                                        error(ERR_MAX_LIST_LVL_REACHED);
+                                    }
+                                }
+                            }
+                            listlvl++;
+                            numl[listlvl] = false;
+                            liststart[listlvl] = start;
+                            listarted[listlvl] = true;
+                            puts("+list");
+                            puts("+el");
+                            goto skipnt;
+                        } else {
+                            k = start;
+                            goto skipnt;
+                        }
+                    }
                     else {
                         if (p) { p = false; puts("-p"); }
                         printf("+hr\n");
@@ -181,12 +243,16 @@ int main(int argc, char **argv) {
                 }
                 else {
 skipnt:
-                    if (!p) { p = true; puts("+p"); }
+                    if (listlvl == -1 && !p) { p = true; puts("+p"); }
                     if (newline) { newline = false; puts("+newline"); }
                     text = true;
                     k--;
                 }
             } else {
+                if (listlvl != -1 && !listarted[listlvl]) {
+                    listarted[listlvl] = true;
+                    puts("+el");
+                }
                 if (dat[k] == '*') {
                     addnl = false;
                     if (started) { started = false; printf("\n"); }
@@ -208,7 +274,7 @@ skipnt:
                     printf("%c", dat[k + 1]);
                     k++;
                 } else if (dat[k] == ' ' && (ln.size - k) == 2 && dat[k + 1] == ' ') {
-                    newline = true;
+                    newline += 2;
                     break;
                 }
                 
@@ -225,6 +291,17 @@ skipnt:
         free(ln.data);
         ln.data = NULL;
         ln.size = 0;
+    }
+    
+    while (listlvl != -1) {
+        if (listarted[listlvl]) {
+            listarted[listlvl] = false;
+            puts("-el");
+        }
+        puts(numl[listlvl] ? "-nlist" : "-list");
+        numl[listlvl] = false;
+        liststart[listlvl] = 0;
+        listlvl--;
     }
     
     if (p) {

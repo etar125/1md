@@ -17,10 +17,11 @@ typedef enum {
     ERR_BAD_SYNTAX,
     ERR_D_ADDCH,
     ERR_DSTR_TO_STR,
-    ERR_CMD_ERROR
+    ERR_CMD_ERROR,
+    ERR_MAX_LIST_LVL_REACHED
 } err;
 
-#define VERSION "0.4.2"
+#define VERSION "0.5.0"
 #define error(x) retcode = x; goto error
 
 #endif
