@@ -35,6 +35,129 @@ set tests {
 </p>
 "
     }
+    {
+    1
+    "+p
++text Список 1:
++eol
+-p
++list
++el
++text Привет 1
++eol
+-el
++el
++text Привет 2
++eol
++list
++el
++text Подсписок
++eol
++text Да...
++eol
+-el
+-list
++text Нет?
++eol
+-el
++el
++text Пока
++eol
++newline
++text Пока!
++eol
+-el
+-list
++p
++text Список 2:
++eol
+-p
++nlist
++el
++text Привет 1
++eol
+-el
++el
++text Привет 2
++eol
++nlist
++el
++text Подсписок
++eol
++text Да...
++eol
+-el
+-nlist
++text Нет?
++eol
+-el
++el
++text Пока
++eol
++newline
++text Пока!
++eol
+-el
+-nlist
++p
++bold
++text Да
+-bold
++text ...
++eol
+-p
+"
+    "<p>
+Список 1:
+</p>
+<ul>
+<li>
+Привет 1
+</li>
+<li>
+Привет 2
+<ul>
+<li>
+Подсписок
+Да...
+</li>
+</ul>
+Нет?
+</li>
+<li>
+Пока
+<br>
+Пока!
+</li>
+</ul>
+<p>
+Список 2:
+</p>
+<ol>
+<li>
+Привет 1
+</li>
+<li>
+Привет 2
+<ol>
+<li>
+Подсписок
+Да...
+</li>
+</ol>
+Нет?
+</li>
+<li>
+Пока
+<br>
+Пока!
+</li>
+</ol>
+<p>
+<b>Да</b>...
+</p>
+"
+    }
 }
 
 if {[file exists "tests.tmp"]} {
