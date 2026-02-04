@@ -155,6 +155,13 @@ int main(int argc, char **argv) {
             printf("</a></h%d>\n", lvl);
             free(nid.data);
         }
+        else if (strcmp(cmd.data, "+list") == 0) { puts("<ul>"); }
+        else if (strcmp(cmd.data, "-list") == 0) { puts("</ul>"); }
+        else if (strcmp(cmd.data, "+nlist") == 0) { puts("<ol>"); }
+        else if (strcmp(cmd.data, "-nlist") == 0) { puts("</ol>"); }
+        else if (strcmp(cmd.data, "+el") == 0) { puts("<li>"); }
+        else if (strcmp(cmd.data, "-el") == 0) { puts("</li>"); }
+        
         else {
             fprintf(stderr, "unknown command '%s'\n", cmd.data);
             error(ERR_UNKNOWN_COMMAND);
