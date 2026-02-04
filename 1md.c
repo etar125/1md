@@ -24,6 +24,8 @@ int usage() {
     return 0;
 }
 
+#define isdigit(x) x >= '0' && x <= '9'
+
 str_t file, ln, end_cmds;
 size_t cur;
 
@@ -186,7 +188,43 @@ int main(int argc, char **argv) {
                 listlvl--;
             }
             if (!text) {
-                if (dat[k] == '-') {
+                if (isdigit(dat[k])) {
+                    size_t start = k;
+                    while (k < ln.size && isdigit(dat[k])) { k++; }
+                    k++;
+                    if (k >= ln.size || dat[k - 1] != '.' || (k + 1 > ln.size && dat[k + 1] != ' ')) {
+                        k = start;
+                        goto skipnt;
+                    }
+                    if (p) { p = false; puts("-p"); }
+                    newline = false;
+                    k++;
+                    if (listlvl > -1) {
+                        if (liststart[listlvl] == start) {
+                            if (listarted[listlvl]) {
+                                puts("-el");
+                            }
+                            if (!numl[listlvl]) {
+                                puts("-list");
+                                puts("+nlist");
+                            }
+                            numl[listlvl] = true;
+                            puts("+el");
+                            goto skipnt;
+                        } else if (start - liststart[listlvl] >= 4) {
+                            if (listlvl == 5) {
+                                error(ERR_MAX_LIST_LVL_REACHED);
+                            }
+                        }
+                    }
+                    listlvl++;
+                    numl[listlvl] = true;
+                    liststart[listlvl] = start;
+                    listarted[listlvl] = true;
+                    puts("+nlist");
+                    puts("+el");
+                    goto skipnt;
+                } else if (dat[k] == '-') {
                     char ch = dat[k];
                     size_t start = k;
                     while (k < ln.size && dat[k] == ch) { k++; }
