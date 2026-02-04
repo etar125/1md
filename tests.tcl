@@ -109,6 +109,58 @@ line
 -p
 "
     }
+    {
+    1
+    "1. Один
+2. Два
+3. Три
+12. 12, но так-то 4  
+ 00.всё ещё не подсписок
+  0. А это уже подсписок
+ Ну да.
+1. Пока (это 5-ый)
+
+Пока!
+"
+    "+nlist
++el
++text Один
++eol
+-el
++el
++text Два
++eol
+-el
++el
++text Три
++eol
+-el
++el
++text 12, но так-то 4
++eol
++newline
++text 00.всё ещё не подсписок
++eol
++nlist
++el
++text А это уже подсписок
++eol
+-el
+-nlist
++text Ну да.
++eol
+-el
++el
++text Пока (это 5-ый)
++eol
+-el
+-nlist
++p
++text Пока!
++eol
+-p
+"
+    }
 }
 
 if {[file exists "tests.tmp"]} {

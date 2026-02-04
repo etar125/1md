@@ -192,7 +192,7 @@ int main(int argc, char **argv) {
                     size_t start = k;
                     while (k < ln.size && isdigit(dat[k])) { k++; }
                     k++;
-                    if (k >= ln.size || dat[k - 1] != '.' || (k + 1 > ln.size && dat[k + 1] != ' ')) {
+                    if (k >= ln.size || dat[k - 1] != '.' || dat[k] != ' ') {
                         k = start;
                         goto skipnt;
                     }
