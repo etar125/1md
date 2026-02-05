@@ -161,6 +161,54 @@ line
 -p
 "
     }
+    {
+    1
+    "`Test`!  
+Yeaah!
+So, here is my code:  
+```c
+#include <stdio.h>
+int main(void) {
+    puts(\"Hello, World!\");
+    return 0;
+}
+```
+What do `y*u` think?
+"
+    "+p
++ilcode
++text Test
+-ilcode
++text !
++eol
++newline
++text Yeaah!
++eol
++text So, here is my code:
++eol
+-p
++mlcode c
++text #include <stdio.h>
++eol
++text int main(void) {
++eol
++text     puts(\"Hello, World!\");
++eol
++text     return 0;
++eol
++text }
++eol
+-mlcode
++p
++text What do 
++ilcode
++text y*u
+-ilcode
++text  think?
++eol
+-p
+"
+    }
 }
 
 if {[file exists "tests.tmp"]} {
