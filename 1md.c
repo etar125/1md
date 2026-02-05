@@ -101,31 +101,6 @@ int main(int argc, char **argv) {
     buf[filesize] = '\0';
     file = cstr_to_str(buf, false);
     
-    /* OLD */
-    /*
-    bool is_bold          = false,
-         is_italic        = false,
-         is_underline     = false,
-         is_strikethrough = false,
-         is_code          = false,
-         is_inline        = false,
-         is_list          = false,
-         nlist            = false;
-    int add_br = 0;
-    int empty_count = 0;
-    int list_level = 0;
-    
-    bool lvls_nlist[6] = {
-        false, false, false, false, false, false
-    };
-    bool lvls_is_list[6] = {
-        false, false, false, false, false, false
-    };
-    
-    size_t latest_list_i = 0;
-    */
-    /* =-=-=-=-=-=-=-= */
-    
     #define dat ln.data
     bool p = false;
     bool newline = false;
@@ -133,6 +108,9 @@ int main(int argc, char **argv) {
     int empty_count = 0;
     bool bold = false;
     bool italic = false;
+    bool mlcode = false;
+    bool ilcode = false;
+    
     int listlvl = -1;
     #define MAXLISTLVL 6
     bool numl[MAXLISTLVL];
@@ -167,7 +145,7 @@ int main(int argc, char **argv) {
         }
         
         bool started = false;
-        bool skipws = false;
+        bool skipws = mlcode;
         bool text = false;
         size_t k = 0;
         bool addnl = false;
@@ -188,6 +166,22 @@ int main(int argc, char **argv) {
                 listlvl--;
             }
             if (!text) {
+                if (dat[k] == '`') {
+                    if (k + 2 < ln.size && dat[k + 1] == '`' && dat[k + 2] == '`') {
+                        if (mlcode) {
+                            puts("-mlcode");
+                            mlcode = false;
+                        } else {
+                            if (p) { p = false; puts("-p"); }
+                            newline = false;
+                            k += 3;
+                            if (k < ln.size) {
+                                printf("+mlcode %s\n", &dat[k]);
+                            } else { puts("+mlcode"); }
+                            mlcode = true;
+                        } break;
+                    } else { goto skipnt; }
+                } else if (!mlcode) {
                 if (isdigit(dat[k])) {
                     size_t start = k;
                     while (k < ln.size && isdigit(dat[k])) { k++; }
@@ -286,10 +280,25 @@ skipnt:
                     text = true;
                     k--;
                 }
+                } else {
+                    text = true;
+                    k--;
+                }
             } else {
                 if (listlvl != -1 && !listarted[listlvl]) {
                     listarted[listlvl] = true;
                     puts("+el");
+                }
+                if (ilcode || mlcode) {
+                    if (ilcode && dat[k] == '`') {
+                        if (started) { started = false; printf("\n"); }
+                        ilcode = false; puts("-ilcode");
+                        continue;
+                    }
+                    if (!started) { started = true; printf("+text "); }
+                    printf("%c", dat[k]);
+                    addnl = true;
+                    continue;
                 }
                 if (dat[k] == '*') {
                     addnl = false;
@@ -314,6 +323,10 @@ skipnt:
                 } else if (dat[k] == ' ' && (ln.size - k) == 2 && dat[k + 1] == ' ') {
                     newline += 2;
                     break;
+                } else if (dat[k] == '`') {
+                    addnl = false;
+                    if (started) { started = false; printf("\n"); }
+                    ilcode = true; puts("+ilcode");
                 }
                 
                 else {
