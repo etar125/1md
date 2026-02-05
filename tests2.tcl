@@ -4,6 +4,10 @@
 # Licensed under ISC (see LICENSE)
 
 set bin [lindex $argv 0]
+if {$bin == ""} {
+    puts "укажи путь к бинарнику (учти, что запускает в tests.tmp)"
+    exit 1
+}
 
 set tests {
     {
@@ -158,6 +162,39 @@ set tests {
 </p>
 "
     }
+    {
+    1
+    "+p
++text Code:
++eol
+-p
++mlcode sh
++text ./1md \"my file.md\" > \"my file.1md\"
++eol
++text   # yes
++eol
+-mlcode
++p
++text Ques
++ilcode
++text t
+-ilcode
++text ion.
++eol
+-p
+"
+    "<p>
+Code:
+</p>
+<pre><code class=\"language-sh\">
+./1md &quot;my file.md&quot; &gt; &quot;my file.1md&quot;
+  # yes
+</code></pre>
+<p>
+Ques<code>t</code>ion.
+</p>
+"
+    }
 }
 
 if {[file exists "tests.tmp"]} {
@@ -172,7 +209,7 @@ foreach test $tests {
     set fd [open "${fn}.1md" w]
     puts -nonewline $fd [lindex $test 1]
     close $fd
-    if {[catch {exec {*}$bin "${fn}.1md" > "${fn}.html"} error_msg]} {
+    if {[catch {exec $bin "${fn}.1md" > "${fn}.html"} error_msg]} {
         puts "test ${counter}: ${error_msg}"
         incr counter
         continue

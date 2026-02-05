@@ -161,6 +161,23 @@ int main(int argc, char **argv) {
         else if (strcmp(cmd.data, "-nlist") == 0) { puts("</ol>"); }
         else if (strcmp(cmd.data, "+el") == 0) { puts("<li>"); }
         else if (strcmp(cmd.data, "-el") == 0) { puts("</li>"); }
+        else if (strcmp(cmd.data, "+ilcode") == 0) { printf("<code>"); }
+        else if (strcmp(cmd.data, "-ilcode") == 0) { printf("</code>"); }
+        else if (strcmp(cmd.data, "+mlcode") == 0) {
+            if (cmdend + 1 < ln.size) {
+                printf("<pre><code class=\"language-");
+                for (size_t i = cmdend + 1; i < ln.size; i++) {
+                    switch (dat[i]) {
+                        case '&': printf("&amp;"); break;
+                        case '<': printf("&lt;"); break;
+                        case '>': printf("&gt;"); break;
+                        case '"': printf("&quot;"); break;
+                        default: printf("%c", dat[i]);
+                    }
+                }
+                printf("\">\n");
+            } else { puts("<pre><code>"); }
+        } else if (strcmp(cmd.data, "-mlcode") == 0) { puts("</code></pre>"); }
         
         else {
             fprintf(stderr, "unknown command '%s'\n", cmd.data);
