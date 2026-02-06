@@ -19,9 +19,11 @@ char *progname;
 int usage() {
     printf("1md2ht v"VERSION"\n"
            "Usage: %s file.1md\n"
+           "if filename is -, read from stdin\n"
            "Example:\n"
-           "  %s README.1md > README.html\n",
-           progname, progname);
+           "  %s README.1md > README.html\n"
+           "  cat README.1md | %s -\n",
+           progname, progname, progname);
     return 0;
 }
 
@@ -31,35 +33,52 @@ int main(int argc, char **argv) {
     char *filename = NULL;
     str_t file, ln, cmd;
     size_t cur = 0;
+    FILE *f = NULL;
+    char *buf;
+    size_t filesize;
     file = ln = cmd = emptystr();
     if (argc != 2) { return usage(); }
     for (int i = 1; i < argc; i++) {
         filename = argv[i];
     }
-    if (!filename) { return usage(); }
+    if (!filename || strcmp(filename, "-") == 0) { f = stdin; }
     
-    FILE *f = NULL;
-    if (access(filename, F_OK) != 0) {
-        fprintf(stderr, "can't access %s", filename);
-        perror("");
-        error(ERR_FILE_ACCESS);
-    }
-    f = fopen(filename, "r");
     if (!f) {
-        perror("File open error");
-        error(ERR_FILE_OPEN);
+        if (access(filename, F_OK) != 0) {
+            fprintf(stderr, "can't access %s", filename);
+            error(ERR_FILE_ACCESS);
+        }
+        f = fopen(filename, "r");
+        if (!f) {
+            perror("File open error");
+            error(ERR_FILE_OPEN);
+        }
+        
+        fseek(f, 0, SEEK_END);
+        filesize = ftell(f);
+        rewind(f);
+
+        buf = malloc(filesize + 1);
+        if (!buf) { error(ERR_MALLOC); }
+
+        fread(buf, 1, filesize, f);
+        buf[filesize] = '\0';
+        file = cstr_to_str(buf, false);
+    } else {
+        dstr_t tmp = emptydstr();
+        char ch;
+        while ((ch = fgetc(f)) != EOF) {
+            if (d_addch(&tmp, ch) != 0) {
+                if (tmp.data) { free(tmp.data); }
+                error(ERR_D_ADDCH);
+            }
+        }
+        file = dstr_to_str(&tmp, true);
+        if (!file.data) {
+            if (tmp.data) { free(tmp.data); }
+            error(ERR_DSTR_TO_STR);
+        }
     }
-    
-    fseek(f, 0, SEEK_END);
-    size_t filesize = ftell(f);
-    rewind(f);
-    
-    char *buf = malloc(filesize + 1);
-    if (!buf) { error(ERR_MALLOC); }
-    
-    fread(buf, 1, filesize, f);
-    buf[filesize] = '\0';
-    file = cstr_to_str(buf, false);
     
     #define dat ln.data
     
@@ -196,6 +215,6 @@ error:
     if (file.data) { free(file.data); }
     if (ln.data) { free(ln.data); }
     if (cmd.data) { free(cmd.data); }
-    if (f) { fclose(f); }
+    if (f && f != stdin) { fclose(f); }
     return retcode;
 }
