@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
     
     if (!f) {
         if (access(filename, F_OK) != 0) {
-            fprintf(stderr, "can't access %s", filename);
+            fprintf(stderr, "can't access %s\n", filename);
             error(ERR_FILE_ACCESS);
         }
         f = fopen(filename, "r");
