@@ -82,6 +82,12 @@ int main(int argc, char **argv) {
     
     #define dat ln.data
     
+    /*
+        OPTIONS
+    */
+    
+    str_t alt = emptystr();
+    
     for (; cur < sarr_count(&file); cur++) {
         ln = sarr_getdup(&file, cur);
         if (ln.size == 0) { continue; }
@@ -94,6 +100,8 @@ int main(int argc, char **argv) {
         if (!cmd.data) { error(ERR_MALLOC); }
         memcpy(cmd.data, dat, cmdend);
         cmd.data[cmdend] = '\0';
+        
+        bool opt = false;
         
         if (strcmp(cmd.data, "+p") == 0) { puts("<p>"); }
         else if (strcmp(cmd.data, "-p") == 0) { puts("</p>"); }
@@ -197,10 +205,60 @@ int main(int argc, char **argv) {
                 printf("\">\n");
             } else { puts("<pre><code>"); }
         } else if (strcmp(cmd.data, "-mlcode") == 0) { puts("</code></pre>"); }
+        else if (strcmp(cmd.data, "+opt") == 0) {
+            if (dat[cmdend] != ' ') { error(ERR_BAD_SYNTAX); }
+            size_t optend = cmdend + 1;
+            while (optend < ln.size && dat[optend] != ' ') { optend++; }
+            if (optend == cmdend + 1 || optend + 1 >= ln.size) { error(ERR_BAD_SYNTAX); }
+            dat[optend] = '\0';
+            if (strcmp(&dat[cmdend + 1], "alt") == 0) {
+                alt = cstr_to_str(&dat[optend + 1], true);
+            } else { error(ERR_BAD_SYNTAX); }
+            opt = true;
+        } else if (strcmp(cmd.data, "+link") == 0) {
+            if (dat[cmdend] != ' ' || cmdend + 1 >= ln.size) { error(ERR_BAD_SYNTAX); }
+            printf("<a href=\"");
+            for (size_t i = cmdend + 1; i < ln.size; i++) {
+                switch (dat[i]) {
+                    case '&': printf("&amp;"); break;
+                    default: printf("%c", dat[i]);
+                }
+            }
+            printf("\">");
+        } else if (strcmp(cmd.data, "-link") == 0) { printf("</a>"); }
+        else if (strcmp(cmd.data, "+img") == 0) {
+            if (dat[cmdend] != ' ' || cmdend + 1 >= ln.size) { error(ERR_BAD_SYNTAX); }
+            printf("<img href=\"");
+            for (size_t i = cmdend + 1; i < ln.size; i++) {
+                switch (dat[i]) {
+                    case '&': printf("&amp;"); break;
+                    default: printf("%c", dat[i]);
+                }
+            }
+            printf("\"");
+            if (alt.data) {
+                printf(" alt=\"");
+                for (size_t i = 0; i < alt.size; i++) {
+                    switch (alt.data[i]) {
+                        case '&': printf("&amp;"); break;
+                        case '<': printf("&lt;"); break;
+                        case '>': printf("&gt;"); break;
+                        case '"': printf("&quot;"); break;
+                        default: printf("%c", alt.data[i]);
+                    }
+                }
+                printf("\"");
+            }
+            printf(">");
+        }
         
         else {
             fprintf(stderr, "unknown command '%s'\n", cmd.data);
             error(ERR_UNKNOWN_COMMAND);
+        }
+        
+        if (!opt) {
+            if (alt.data) { free(alt.data); alt = emptystr(); }
         }
         
         free(ln.data);
