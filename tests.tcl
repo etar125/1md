@@ -209,6 +209,29 @@ What do `y*u` think?
 -p
 "
     }
+    {
+    1
+    "Hallo. [etar**125**.ru](https://etar125.ru)  
+Desktop: ![Desk](https://media.etar125.ru/mgr1.jpg)
+"
+    "+p
++text Hallo. 
++link https://etar125.ru
++text etar
++bold
++text 125
+-bold
++text .ru
+-link
++eol
++newline
++text Desktop: 
++opt alt Desk
++img https://media.etar125.ru/mgr1.jpg
++eol
+-p
+"
+    }
 }
 
 if {[file exists "tests.tmp"]} {

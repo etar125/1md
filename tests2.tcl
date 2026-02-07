@@ -195,6 +195,32 @@ Ques<code>t</code>ion.
 </p>
 "
     }
+    {
+    1
+    "+p
++text Hallo. 
++link https://etar125.ru
++text etar
++bold
++text 125
+-bold
++text .ru
+-link
++eol
++newline
++text Desktop: 
++opt alt Desk
++img https://media.etar125.ru/mgr1.jpg
++eol
+-p
+"
+    "<p>
+Hallo. <a href=\"https://etar125.ru\">etar<b>125</b>.ru</a>
+<br>
+Desktop: <img href=\"https://media.etar125.ru/mgr1.jpg\" alt=\"Desk\">
+</p>
+"
+    }
 }
 
 if {[file exists "tests.tmp"]} {
