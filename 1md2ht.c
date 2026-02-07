@@ -228,7 +228,7 @@ int main(int argc, char **argv) {
         } else if (strcmp(cmd.data, "-link") == 0) { printf("</a>"); }
         else if (strcmp(cmd.data, "+img") == 0) {
             if (dat[cmdend] != ' ' || cmdend + 1 >= ln.size) { error(ERR_BAD_SYNTAX); }
-            printf("<img href=\"");
+            printf("<img src=\"");
             for (size_t i = cmdend + 1; i < ln.size; i++) {
                 switch (dat[i]) {
                     case '&': printf("&amp;"); break;

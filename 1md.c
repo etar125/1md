@@ -251,9 +251,9 @@ int main(int argc, char **argv) {
                     size_t start = k;
                     while (k < ln.size && dat[k] == ch) { k++; }
                     if (dat[k] != '\0') {
-                        if (p) { p = false; puts("-p"); }
-                        newline = false;
                         if (k - start == 1 && dat[k] == ' ') {
+                            if (p) { p = false; puts("-p"); }
+                            newline = false;
                             k++;
                             if (listlvl > -1) {
                                 if (liststart[listlvl] == start) {
@@ -358,23 +358,22 @@ skipnt:
                 } else if (dat[k] == '[') {
                     addnl = false;
                     if (started) { started = false; printf("\n"); }
-                    size_t start = ++k;
-                    size_t visend = start, urlstart = start, urlend = start;
+                    size_t start = k, visend = k, urlstart = k, urlend = k;
                     while (k < ln.size && dat[k] != ']') { k++; }
-                    if (dat[k] != ']') { error(ERR_BAD_SYNTAX); }
+                    if (dat[k] != ']') { k = start; goto skipt; }
                     visend = k;
                     if (autolink) {
                         /* not implemented */
                     } else {
                         k++;
-                        if (k >= ln.size || dat[k] != '(') { error(ERR_BAD_SYNTAX); }
+                        if (k >= ln.size || dat[k] != '(') { k = start; goto skipt; }
                         urlstart = k + 1;
                         while (k < ln.size && dat[k] != ')') { k++; }
-                        if (k >= ln.size || dat[k] != ')') { error(ERR_BAD_SYNTAX); }
+                        if (k >= ln.size || dat[k] != ')') { k = start; goto skipt; }
                         urlend = k;
                         if (image) {
                             printf("+opt alt ");
-                            for (size_t q = start; q < visend; q++) { putchar(dat[q]); }
+                            for (size_t q = start + 1; q < visend; q++) { putchar(dat[q]); }
                             printf("\n+img ");
                             for (size_t q = urlstart; q < urlend; q++) { putchar(dat[q]); }
                             putchar('\n');
@@ -382,7 +381,7 @@ skipnt:
                             printf("+link ");
                             for (size_t q = urlstart; q < urlend; q++) { putchar(dat[q]); }
                             putchar('\n');
-                            k = start - 1;
+                            k = start;
                             link = true;
                             linkend = urlend;
                         }
@@ -398,6 +397,7 @@ skipnt:
                 }
                 
                 else {
+skipt:
                     if (!started) { started = true; printf("+text "); }
                     printf("%c", dat[k]);
                     addnl = true;
