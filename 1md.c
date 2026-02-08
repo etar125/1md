@@ -137,6 +137,7 @@ int main(int argc, char **argv) {
     bool link = false;
     bool image = false;
     bool autolink = false;
+    bool linkimg = false;
     size_t linkend = 0;
     
     int listlvl = -1;
@@ -372,11 +373,19 @@ skipnt:
                         if (k >= ln.size || dat[k] != ')') { k = start; goto skipt; }
                         urlend = k;
                         if (image) {
+                            if (linkimg) {
+                                printf("+link ");
+                                for (size_t q = urlstart; q < urlend; q++) { putchar(dat[q]); }
+                                putchar('\n');
+                            }
                             printf("+opt alt ");
                             for (size_t q = start + 1; q < visend; q++) { putchar(dat[q]); }
                             printf("\n+img ");
                             for (size_t q = urlstart; q < urlend; q++) { putchar(dat[q]); }
                             putchar('\n');
+                            if (linkimg) { printf("-link\n"); }
+                            image = false;
+                            linkimg = false;
                         } else {
                             printf("+link ");
                             for (size_t q = urlstart; q < urlend; q++) { putchar(dat[q]); }
@@ -392,8 +401,10 @@ skipnt:
                     link = false;
                     puts("-link");
                     k = linkend;
-                } else if (dat[k] == '!' && k + 1 < ln.size && dat[k + 1] == '[') {
-                    image = true;
+                } else if (dat[k] == '!' && k + 1 < ln.size) {
+                    if (dat[k + 1] == '!' && k + 2 < ln.size && dat[k + 2] == '[') {
+                        k++, linkimg = true, image = true;
+                    } else if (dat[k + 1] == '[') { image = true; }
                 }
                 
                 else {
