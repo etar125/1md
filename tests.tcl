@@ -29,7 +29,8 @@ set tests {
     {
     1
     "Привет, **мир**!  
-$Курсив*, шекели**.**"
+$Курсив*, шекели**.**
+"
     "+p
 +text Привет, 
 +bold
@@ -228,6 +229,20 @@ Desktop: ![Desk](https://media.etar125.ru/mgr1.jpg)
 +text Desktop: 
 +opt alt Desk
 +img https://media.etar125.ru/mgr1.jpg
++eol
+-p
+"
+    }
+    {
+    1
+    "Manager: !![mgr2](https://media.etar125.ru/mgr2.jpg)
+"
+    "+p
++text Manager: 
++link https://media.etar125.ru/mgr2.jpg
++opt alt mgr2
++img https://media.etar125.ru/mgr2.jpg
+-link
 +eol
 -p
 "

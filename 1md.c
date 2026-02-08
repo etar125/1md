@@ -405,6 +405,7 @@ skipnt:
                     if (dat[k + 1] == '!' && k + 2 < ln.size && dat[k + 2] == '[') {
                         k++, linkimg = true, image = true;
                     } else if (dat[k + 1] == '[') { image = true; }
+                    else { goto skipt; }
                 }
                 
                 else {
