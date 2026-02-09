@@ -169,8 +169,9 @@ int main(int argc, char **argv) {
                 listlvl--;
             }
         }
-        if (dat[0] == '?' && cmd(&ln) != 0) {
-            error(ERR_CMD_ERROR);
+        if (dat[0] == '?') {
+            if (cmd(&ln) != 0) { error(ERR_CMD_ERROR); }
+            else { continue; }
         }
         
         bool started = false;

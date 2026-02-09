@@ -250,7 +250,10 @@ int main(int argc, char **argv) {
                 printf("\"");
             }
             printf(">");
-        }
+        } else if (strcmp(cmd.data, "+details") == 0) { puts("<details>"); }
+        else if (strcmp(cmd.data, "-details") == 0) { puts("</details>"); }
+        else if (strcmp(cmd.data, "+summary") == 0) { printf("<summary>"); }
+        else if (strcmp(cmd.data, "-summary") == 0) { printf("</summary>"); }
         
         else {
             fprintf(stderr, "unknown command '%s'\n", cmd.data);
