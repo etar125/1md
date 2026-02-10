@@ -21,7 +21,7 @@ typedef enum {
     ERR_MAX_LIST_LVL_REACHED
 } err;
 
-#define VERSION "0.7.3"
+#define VERSION "0.7.4"
 #define error(x) retcode = x; goto error
 
 #endif

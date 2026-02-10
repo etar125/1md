@@ -37,6 +37,7 @@ int cmd(str_t *ln) {
     size_t sz = ln->size;
     if (!l || sz == 0) {
         fprintf(stderr, "1cmd: bad args\n");
+        if (ln->data) { free(ln->data); ln->data = NULL; ln->size = 0; }
         return 1;
     }
     #define dat l
@@ -45,12 +46,14 @@ int cmd(str_t *ln) {
     while (cmdend < sz && dat[cmdend] != ' ') { cmdend++; }
     if (cmdend == 1) {
         fprintf(stderr, "1cmd: command is missing\n");
+        if (ln->data) { free(ln->data); ln->data = NULL; ln->size = 0; }
         return 1;
     }
     cmd.size = cmdend - 1;
     cmd.data = malloc(cmd.size + 1);
     if (!cmd.data) {
         fprintf(stderr, "1cmd: malloc error\n");
+        if (ln->data) { free(ln->data); ln->data = NULL; ln->size = 0; }
         return 1;
     }
     memcpy(cmd.data, &dat[1], cmd.size);
@@ -66,6 +69,8 @@ int cmd(str_t *ln) {
     
     
     #undef dat
+    if (cmd.data) { free(cmd.data); }
+    if (ln->data) { free(ln->data); ln->data = NULL; ln->size = 0; }
     
     return 0;
 }
@@ -152,8 +157,8 @@ int main(int argc, char **argv) {
     for (; cur < sarr_count(&file); cur++) {
         ln = sarr_getdup(&file, cur);
         
-        if (ln.size == 0) { empty_count++; continue; }
-        if (!dat) { error(ERR_MALLOC); }
+        if ((ln.data && !ln.data[0]) || ln.size == 0) { free(ln.data); ln.data = NULL; empty_count++; continue; }
+        if (ln.size != 0 && !dat) { error(ERR_MALLOC); }
         if (empty_count) {
             empty_count = 0;
             newline = false;
