@@ -217,7 +217,7 @@ Ques<code>t</code>ion.
     "<p>
 Hallo. <a href=\"https://etar125.ru\">etar<b>125</b>.ru</a>
 <br>
-Desktop: <img href=\"https://media.etar125.ru/mgr1.jpg\" alt=\"Desk\">
+Desktop: <img src=\"https://media.etar125.ru/mgr1.jpg\" alt=\"Desk\">
 </p>
 "
     }
