@@ -265,6 +265,8 @@ int main(int argc, char **argv) {
                             bool addchk = false, chkd = false;
                             if (k + 2 < ln.size && dat[k] == '[' && dat[k + 2] == ']') {
                                 addchk = true, chkd = (dat[k + 1] == 'x');
+                                k += 3;
+                                if (k < ln.size && dat[k] == ' ') { k++; }
                             }
                             if (listlvl > -1) {
                                 if (liststart[listlvl] == start) {
