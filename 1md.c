@@ -262,6 +262,10 @@ int main(int argc, char **argv) {
                             if (p) { p = false; puts("-p"); }
                             newline = false;
                             k++;
+                            bool addchk = false, chkd = false;
+                            if (k + 2 < ln.size && dat[k] == '[' && dat[k + 2] == ']') {
+                                addchk = true, chkd = (dat[k + 1] == 'x');
+                            }
                             if (listlvl > -1) {
                                 if (liststart[listlvl] == start) {
                                     if (listarted[listlvl]) {
@@ -272,6 +276,10 @@ int main(int argc, char **argv) {
                                         puts("+list");
                                     }
                                     puts("+el");
+                                    if (addchk) {
+                                        if (chkd) { puts("+checkedbox"); }
+                                        else { puts("+uncheckedbox"); }
+                                    }
                                     goto skipnt;
                                 } else if (start - liststart[listlvl] >= 4) {
                                     if (listlvl == 5) {
@@ -285,6 +293,10 @@ int main(int argc, char **argv) {
                             listarted[listlvl] = true;
                             puts("+list");
                             puts("+el");
+                            if (addchk) {
+                                if (chkd) { puts("+checkedbox"); }
+                                else { puts("+uncheckedbox"); }
+                            }
                             goto skipnt;
                         } else {
                             k = start;
