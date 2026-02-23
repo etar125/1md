@@ -254,6 +254,11 @@ int main(int argc, char **argv) {
         else if (strcmp(cmd.data, "-details") == 0) { puts("</details>"); }
         else if (strcmp(cmd.data, "+summary") == 0) { printf("<summary>"); }
         else if (strcmp(cmd.data, "-summary") == 0) { printf("</summary>"); }
+        else if (strcmp(cmd.data, "+checkedbox") == 0) {
+            puts("<input type=\"checkbox\" disabled=\"\" checked=\"\">");
+        } else if (strcmp(cmd.data, "+uncheckedbox") == 0) {
+            puts("<input type=\"checkbox\" disabled=\"\">");
+        }
         
         else {
             fprintf(stderr, "unknown command '%s'\n", cmd.data);
