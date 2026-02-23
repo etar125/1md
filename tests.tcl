@@ -247,6 +247,25 @@ Desktop: ![Desk](https://media.etar125.ru/mgr1.jpg)
 -p
 "
     }
+    {
+    1
+    "- [ ] Unchecked
+- [x] Checked
+"
+    "+list
++el
++uncheckedbox
++text Unchecked
++eol
+-el
++el
++checkedbox
++text Checked
++eol
+-el
+-list
+"
+    }
 }
 
 if {[file exists "tests.tmp"]} {

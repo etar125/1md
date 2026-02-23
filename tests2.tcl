@@ -221,6 +221,33 @@ Desktop: <img src=\"https://media.etar125.ru/mgr1.jpg\" alt=\"Desk\">
 </p>
 "
     }
+    {
+    1
+    "+list
++el
++uncheckedbox
++text Unchecked
++eol
+-el
++el
++checkedbox
++text Checked
++eol
+-el
+-list
+"
+    "<ul>
+<li>
+<input type=\"checkbox\" disabled=\"\">
+Unchecked
+</li>
+<li>
+<input type=\"checkbox\" disabled=\"\" checked=\"\">
+Checked
+</li>
+</ul>
+"
+    }
 }
 
 if {[file exists "tests.tmp"]} {
