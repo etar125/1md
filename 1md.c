@@ -59,11 +59,23 @@ int cmd(str_t *ln) {
     memcpy(cmd.data, &dat[1], cmd.size);
     cmd.data[cmd.size] = '\0';
     
-    if (strcmp(cmd.data, "raw") == 0) {
+    if (strcmp(cmd.data, ".") == 0 || strcmp(cmd.data, "raw") == 0) {
         cmdend++;
         while (cmdend < sz) { printf("%c", dat[cmdend++]); }
         printf("\n");
-    } else {
+    } else if (strcmp(cmd.data, "opt") == 0) {
+        printf("+opt ");
+        cmdend++;
+        while (cmdend < sz) { printf("%c", dat[cmdend++]); }
+        printf("\n");
+    } else if (strcmp(cmd.data, "com") == 0) {
+        printf("+com ");
+        cmdend++;
+        while (cmdend < sz) { printf("%c", dat[cmdend++]); }
+        printf("\n");
+    }
+    
+    else {
         fprintf(stderr, "1cmd: unknown command '%s'\n", cmd.data);
     }
     
