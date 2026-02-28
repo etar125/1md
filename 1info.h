@@ -18,7 +18,8 @@ typedef enum {
     ERR_D_ADDCH,
     ERR_DSTR_TO_STR,
     ERR_CMD_ERROR,
-    ERR_MAX_LIST_LVL_REACHED
+    ERR_MAX_LIST_LVL_REACHED,
+    ERR_UNKNOWN_OPTION
 } err;
 
 #define VERSION "0.8.0"

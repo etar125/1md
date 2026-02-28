@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
         OPTIONS
     */
     
-    str_t alt = emptystr();
+    str_t alt = emptystr(), id = emptystr();
     
     for (; cur < sarr_count(&file); cur++) {
         ln = sarr_getdup(&file, cur);
@@ -136,36 +136,64 @@ int main(int argc, char **argv) {
             free(t);
             if (lvl > 6) { lvl = 6; }
             
-            dstr_t id = emptydstr();
+            str_t nid = emptystr();
+            dstr_t did = emptydstr();
             
-            for (size_t i = lvlend + 1; i < ln.size; i++) {
-                char ch = dat[i];
-                switch (ch) {
-                    case '<':
-                    case '>':
-                    case '(':
-                    case ')':
-                    case '[':
-                    case ']':
-                    case '.':
-                    case '&':
-                    case '#':
-                    case '/':
-                        ch = '-';
-                        break;
-                    case ' ':
-                        ch = '_';
-                        break;
+            if (!id.data) {
+                for (size_t i = lvlend + 1; i < ln.size; i++) {
+                    char ch = dat[i];
+                    switch (ch) {
+                        case '<':
+                        case '>':
+                        case '(':
+                        case ')':
+                        case '[':
+                        case ']':
+                        case '.':
+                        case '&':
+                        case '#':
+                        case '/':
+                            ch = '-';
+                            break;
+                        case ' ':
+                            ch = '_';
+                            break;
+                    }
+                    if (d_addch(&did, ch) != 0) {
+                        if (did.data) { free(did.data); }
+                        error(ERR_D_ADDCH);
+                    }
                 }
-                if (d_addch(&id, ch) != 0) {
-                    if (id.data) { free(id.data); }
-                    error(ERR_D_ADDCH);
+            } else {
+                for (size_t i = 0; i < id.size; i++) {
+                    char ch = id.data[i];
+                    switch (ch) {
+                        case '<':
+                        case '>':
+                        case '(':
+                        case ')':
+                        case '[':
+                        case ']':
+                        case '.':
+                        case '&':
+                        case '#':
+                        case '/':
+                            ch = '-';
+                            break;
+                        case ' ':
+                            ch = '_';
+                            break;
+                    }
+                    if (d_addch(&did, ch) != 0) {
+                        if (did.data) { free(did.data); }
+                        error(ERR_D_ADDCH);
+                    }
                 }
             }
             
-            str_t nid = dstr_to_str(&id, true);
+            nid = dstr_to_str(&did, true);
             if (!nid.data) {
-                if (id.data) { free(id.data); }
+                if (did.data) { free(did.data); }
                 error(ERR_DSTR_TO_STR);
             }
             
@@ -212,8 +240,14 @@ int main(int argc, char **argv) {
             if (optend == cmdend + 1 || optend + 1 >= ln.size) { error(ERR_BAD_SYNTAX); }
             dat[optend] = '\0';
             if (strcmp(&dat[cmdend + 1], "alt") == 0) {
+                if (alt.data) { free(alt.data); }
                 alt = cstr_to_str(&dat[optend + 1], true);
-            } else { error(ERR_BAD_SYNTAX); }
+            } else if (strcmp(&dat[cmdend + 1], "id") == 0) {
+                if (id.data) { free(id.data); }
+                id = cstr_to_str(&dat[optend + 1], true);
+            }
+            
+            else { error(ERR_UNKNOWN_OPTION); }
             opt = true;
         } else if (strcmp(cmd.data, "+link") == 0) {
             if (dat[cmdend] != ' ' || cmdend + 1 >= ln.size) { error(ERR_BAD_SYNTAX); }
@@ -258,6 +292,11 @@ int main(int argc, char **argv) {
             puts("<input type=\"checkbox\" disabled=\"\" checked=\"\">");
         } else if (strcmp(cmd.data, "+uncheckedbox") == 0) {
             puts("<input type=\"checkbox\" disabled=\"\">");
+        } else if (strcmp(cmd.data, "+com") == 0) {
+            for (size_t i = cmdend + 1; i < ln.size; i++) {
+                if (dat[i] == '>') { printf(" >"); }
+                else { printf("%c", dat[i]); }
+            }
         }
         
         else {
@@ -281,6 +320,8 @@ error:
     if (file.data) { free(file.data); }
     if (ln.data) { free(ln.data); }
     if (cmd.data) { free(cmd.data); }
+    if (alt.data) { free(alt.data); }
+    if (id.data) { free(id.data); }
     if (f && f != stdin) { fclose(f); }
     return retcode;
 }

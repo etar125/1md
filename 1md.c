@@ -324,6 +324,7 @@ int main(int argc, char **argv) {
                     }
                 } else if (dat[k] == '#') {
                     if (p) { p = false; puts("-p"); }
+                    newline = false;
                     int hlvl = 0;
                     while (k < ln.size && dat[k] == '#') { k++, hlvl++; }
                     if (hlvl > 6) { hlvl = 6; }
