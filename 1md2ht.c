@@ -87,6 +87,7 @@ int main(int argc, char **argv) {
     */
     
     str_t alt = emptystr(), id = emptystr();
+    bool noheaderlink = false;
     
     for (; cur < sarr_count(&file); cur++) {
         ln = sarr_getdup(&file, cur);
@@ -197,7 +198,10 @@ int main(int argc, char **argv) {
                 error(ERR_DSTR_TO_STR);
             }
             
-            printf("<h%d><a class=\"header-link\" id=\"%s\" href=\"#%s\">", lvl, nid.data, nid.data);
+            printf("<h%d>", lvl);
+            if (!noheaderlink) {
+                printf("<a class=\"header-link\" id=\"%s\" href=\"#%s\">", nid.data, nid.data);
+            }
             for (size_t i = lvlend + 1; i < ln.size; i++) {
                 switch (dat[i]) {
                     case '&': printf("&amp;"); break;
@@ -207,7 +211,9 @@ int main(int argc, char **argv) {
                     default: printf("%c", dat[i]);
                 }
             }
-            printf("</a></h%d>\n", lvl);
+            if (!noheaderlink) { printf("</a>"); }
+            printf("</h%d>\n", lvl);
+            if (noheaderlink) { noheaderlink = false; }
             free(nid.data);
         }
         else if (strcmp(cmd.data, "+list") == 0) { puts("<ul>"); }
@@ -245,6 +251,8 @@ int main(int argc, char **argv) {
             } else if (strcmp(&dat[cmdend + 1], "id") == 0) {
                 if (id.data) { free(id.data); }
                 id = cstr_to_str(&dat[optend + 1], true);
+            } else if (strcmp(&dat[cmdend + 1], "noheaderlink") == 0) {
+                noheaderlink = true;
             }
             
             else { error(ERR_UNKNOWN_OPTION); }
