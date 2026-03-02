@@ -17,10 +17,10 @@ set tests {
 +h 3 Что???
 +h 7 Да нет.
 "
-    "<h1><a class=\"header-link\" id=\"Привет\" href=\"#Привет\">Привет</a></h1>
-<h2><a class=\"header-link\" id=\"Пока\" href=\"#Пока\">Пока</a></h2>
-<h3><a class=\"header-link\" id=\"Что???\" href=\"#Что???\">Что???</a></h3>
-<h6><a class=\"header-link\" id=\"Да_нет-\" href=\"#Да_нет-\">Да нет.</a></h6>
+    "<h1 id=\"Привет\"><a class=\"header-link\" href=\"#Привет\">Привет</a></h1>
+<h2 id=\"Пока\"><a class=\"header-link\" href=\"#Пока\">Пока</a></h2>
+<h3 id=\"Что???\"><a class=\"header-link\" href=\"#Что???\">Что???</a></h3>
+<h6 id=\"Да_нет-\"><a class=\"header-link\" href=\"#Да_нет-\">Да нет.</a></h6>
 "
     }
     {

@@ -22,7 +22,7 @@ typedef enum {
     ERR_UNKNOWN_OPTION
 } err;
 
-#define VERSION "0.8.1"
+#define VERSION "0.8.2"
 #define error(x) retcode = x; goto error
 
 #endif

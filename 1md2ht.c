@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
         OPTIONS
     */
     
-    str_t alt = emptystr(), id = emptystr();
+    str_t alt = emptystr(), id = emptystr(), class = emptystr();
     bool noheaderlink = false;
     
     for (; cur < sarr_count(&file); cur++) {
@@ -198,9 +198,11 @@ int main(int argc, char **argv) {
                 error(ERR_DSTR_TO_STR);
             }
             
-            printf("<h%d>", lvl);
+            printf("<h%d", lvl);
+            if (class.data) { printf(" class=\"%s\"", class.data); }
+            printf(" id=\"%s\">", nid.data);
             if (!noheaderlink) {
-                printf("<a class=\"header-link\" id=\"%s\" href=\"#%s\">", nid.data, nid.data);
+                printf("<a class=\"header-link\" href=\"#%s\">", nid.data);
             }
             for (size_t i = lvlend + 1; i < ln.size; i++) {
                 switch (dat[i]) {
@@ -253,6 +255,9 @@ int main(int argc, char **argv) {
                 id = cstr_to_str(&dat[optend + 1], true);
             } else if (strcmp(&dat[cmdend + 1], "noheaderlink") == 0) {
                 noheaderlink = true;
+            } else if (strcmp(&dat[cmdend + 1], "class") == 0) {
+                if (class.data) { free(class.data); }
+                class = cstr_to_str(&dat[optend + 1], true);
             }
             
             else { error(ERR_UNKNOWN_OPTION); }
@@ -330,6 +335,7 @@ error:
     if (cmd.data) { free(cmd.data); }
     if (alt.data) { free(alt.data); }
     if (id.data) { free(id.data); }
+    if (class.data) { free(class.data); }
     if (f && f != stdin) { fclose(f); }
     return retcode;
 }
