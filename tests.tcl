@@ -266,6 +266,17 @@ Desktop: ![Desk](https://media.etar125.ru/mgr1.jpg)
 -list
 "
     }
+    {
+    1
+    "?opt noheaderlink a
+?opt id test
+# Test
+"
+    "+opt noheaderlink a
++opt id test
++h 1 Test
+"
+    }
 }
 
 if {[file exists "tests.tmp"]} {

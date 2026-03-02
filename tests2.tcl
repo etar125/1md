@@ -248,6 +248,15 @@ Checked
 </ul>
 "
     }
+    {
+    1
+    "+opt noheaderlink a
++opt id test
++h 1 Test
+"
+    "<h1 id=\"test\">Test</h1>
+"
+    }
 }
 
 if {[file exists "tests.tmp"]} {
