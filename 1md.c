@@ -68,8 +68,8 @@ int cmd(str_t *ln) {
         cmdend++;
         while (cmdend < sz) { printf("%c", dat[cmdend++]); }
         printf("\n");
-    } else if (strcmp(cmd.data, "com") == 0) {
-        printf("+com ");
+    } else if (strcmp(cmd.data, "com") == 0 || strcmp(cmd.data, "open") == 0 || strcmp(cmd.data, "close") == 0) {
+        printf("+%s ", cmd.data);
         cmdend++;
         while (cmdend < sz) { printf("%c", dat[cmdend++]); }
         printf("\n");

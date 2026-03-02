@@ -306,10 +306,32 @@ int main(int argc, char **argv) {
         } else if (strcmp(cmd.data, "+uncheckedbox") == 0) {
             puts("<input type=\"checkbox\" disabled=\"\">");
         } else if (strcmp(cmd.data, "+com") == 0) {
+            printf("<!--");
             for (size_t i = cmdend + 1; i < ln.size; i++) {
                 if (dat[i] == '>') { printf(" >"); }
                 else { printf("%c", dat[i]); }
             }
+            printf("-->");
+        } else if (strcmp(cmd.data, "+open") == 0) {
+            cmdend++;
+            if (strcmp(&dat[cmdend], "div") == 0) {
+                printf("<div");
+                if (class.data) { printf(" class=\"%s\"", class.data); }
+                if (id.data) { printf(" id=\"%s\"", id.data); }
+                printf(">\n");
+            } else if (strcmp(&dat[cmdend], "span") == 0) {
+                printf("<span");
+                if (class.data) { printf(" class=\"%s\"", class.data); }
+                if (id.data) { printf(" id=\"%s\"", id.data); }
+                printf(">\n");
+            } else { error(ERR_UNKNOWN_OPTION); }
+        } else if (strcmp(cmd.data, "+close") == 0) {
+            cmdend++;
+            if (strcmp(&dat[cmdend], "div") == 0) {
+                printf("</div>\n");
+            } else if (strcmp(&dat[cmdend], "span") == 0) {
+                printf("</span>\n");
+            } else { error(ERR_UNKNOWN_OPTION); }
         }
         
         else {
